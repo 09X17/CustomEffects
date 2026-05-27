@@ -16,14 +16,17 @@ Plugin de efectos visuales para Minecraft con sistema de categorías, vouchers y
 - Paper 1.21.1 o superior
 - Java 21
 - PlaceholderAPI
+- [TheSalt's Text Effects](https://modrinth.com/resourcepack/thesalts-text-effects) v1.1.1 (resource pack)
 
 ## Instalación
 
 1. Descarga el archivo `CustomEffects-1.10.0.jar`
 2. Colócalo en la carpeta `plugins/` de tu servidor
-3. Reinicia el servidor
-4. Edita `plugins/CustomEffects/config.yml` según tus necesidades
-5. Recarga con `/effectos reload`
+3. Descarga [TheSalt's Text Effects v1.1.1](https://modrinth.com/resourcepack/thesalts-text-effects/version/1.1.1)
+4. Coloca el texturepack `Text_Effects.zip` en tu servidor, puedes usar por defecto o cargadores externos como NEXO, ITEMSADDER, ORAXEN, entre otros.
+5. Reinicia el servidor
+6. Edita `plugins/CustomEffects/config.yml` según tus necesidades
+7. Recarga con `/effectos reload`
 
 ## Comandos
 
@@ -50,6 +53,7 @@ Aliases: `/efectos`, `/effects`
 |-------------|------|
 | [Paper API](https://papermc.io/) 1.21.1 | Requerida |
 | [PlaceholderAPI](https://github.com/PlaceholderAPI/PlaceholderAPI) 2.11.6 | Requerida |
+| [TheSalt's Text Effects](https://modrinth.com/resourcepack/thesalts-text-effects) v1.1.1 | Resource Pack |
 
 ## Configuración
 
