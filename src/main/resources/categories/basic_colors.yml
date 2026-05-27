@@ -1,0 +1,55 @@
+ondulado:
+  enable: true
+  material: PLAYER_HEAD
+  custom-model-data: 90000
+  slot: 0
+  skull-value: 'eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMjFlZjBmMjU2Zjg4N2FkOTg1YWNkMjI4YWFiZDcyOWFiZjcxY2I5MzQwZThmNDcxYWJlYWY5YTU3MzFkNDQ2YyJ9fX0='
+  display: "#F8F858&lONDULADO"
+  hex: "#F8F858"
+  permission: "effectos.wavy"
+  preview: "#F8F858¡Hola Mundo!"
+
+ondulado_sombra:
+  enable: true
+  material: PLAYER_HEAD
+  slot: 9
+  custom-model-data: 90000
+  skull-value: 'eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMjFlZjBmMjU2Zjg4N2FkOTg1YWNkMjI4YWFiZDcyOWFiZjcxY2I5MzQwZThmNDcxYWJlYWY5YTU3MzFkNDQ2YyJ9fX0='
+  display: "#FFC8C8&lOndulado Sombra"
+  hex: "#FFC8C8"
+  permission: "effectos.shadowwavy"
+  preview: "#FFC8C8¡Hola Mundo!"
+
+rgba_alfa:
+  enable: true
+  material: PLAYER_HEAD
+  custom-model-data: 90000
+  slot: 29
+  skull-value: 'eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMjFlZjBmMjU2Zjg4N2FkOTg1YWNkMjI4YWFiZDcyOWFiZjcxY2I5MzQwZThmNDcxYWJlYWY5YTU3MzFkNDQ2YyJ9fX0='
+  display: "#F8F8B8&lRGBA Alfa"
+  hex: "#F8F8B8"
+  permission: "effectos.rgba"
+  preview: "#F8F8B8¡Hola Mundo!"
+
+extruido_marron:
+  enable: true
+  slot: 30
+  material: PLAYER_HEAD
+  custom-model-data: 90000
+  skull-value: 'eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMjFlZjBmMjU2Zjg4N2FkOTg1YWNkMjI4YWFiZDcyOWFiZjcxY2I5MzQwZThmNDcxYWJlYWY5YTU3MzFkNDQ2YyJ9fX0='
+  display: "#F8F8CC&lExtruido Marrón"
+  hex: "#F8F8CC"
+  permission: "effectos.extrudebrown"
+  preview: "#F8F8CC¡Hola Mundo!"
+
+extruido_3colores:
+  enable: true
+  slot: 31
+  material: PLAYER_HEAD
+  custom-model-data: 90000
+  skull-value: 'eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMjFlZjBmMjU2Zjg4N2FkOTg1YWNkMjI4YWFiZDcyOWFiZjcxY2I5MzQwZThmNDcxYWJlYWY5YTU3MzFkNDQ2YyJ9fX0='
+  display: "#F8F8D0&lExtruido 3 Colores"
+  hex: "#F8F8D0"
+  permission: "effectos.extrude3"
+  preview: "#F8F8D0¡Hola Mundo!"
+

@@ -1,0 +1,175 @@
+sacudida:
+  enable: true
+  material: PAPER
+  custom-model-data: 90000
+  skull-value: ''
+  display: "&b&lᴇғᴇᴄᴛᴏ › #F8F854&lSacudida"
+  hex: "#F8F854"
+  permission: "effectos.shake"
+  preview: "#F8F854Sacudida"
+  lore:
+    - "&7HEX: &f{hex}"
+    - "&7Vista previa: {preview}"
+    - ""
+    - "&7Rareza: &cÉpico"
+
+sacudida_rapida:
+  enable: true
+  material: PAPER
+  custom-model-data: 90000
+  skull-value: ''
+  display: "&b&lᴇғᴇᴄᴛᴏ › #C86432&lSacudida Rápida"
+  hex: "#C86432"
+  permission: "effectos.fastshake"
+  preview: "#C86432Sacudida Rápida"
+
+elastico:
+  enable: true
+  material: PAPER
+  custom-model-data: 90000
+  skull-value: ''
+  display: "&b&lᴇғᴇᴄᴛᴏ › #F8F860&lElástico"
+  hex: "#F8F860"
+  permission: "effectos.bouncy"
+  preview: "#F8F860Elástico"
+
+parpadeo:
+  enable: true
+  material: PAPER
+  custom-model-data: 90000
+  skull-value: ''
+  display: "&b&lᴇғᴇᴄᴛᴏ › #F8F864&lParpadeo"
+  hex: "#F8F864"
+  permission: "effectos.blinking"
+  preview: "#F8F864Parpadeo"
+
+pulso:
+  enable: true
+  material: PAPER
+  custom-model-data: 90000
+  skull-value: ''
+  display: "&b&lᴇғᴇᴄᴛᴏ › #F8F868&lPulso"
+  hex: "#F8F868"
+  permission: "effectos.pulse"
+  preview: "#F8F868Pulso"
+
+giro:
+  enable: true
+  material: PAPER
+  custom-model-data: 90000
+  skull-value: ''
+  display: "&b&lᴇғᴇᴄᴛᴏ › #F8F86C&lGiro"
+  hex: "#F8F86C"
+  permission: "effectos.spin"
+  preview: "#F8F86CGiro"
+
+giro_secuencial:
+  enable: true
+  material: PAPER
+  custom-model-data: 90000
+  skull-value: ''
+  display: "&b&lᴇғᴇᴄᴛᴏ › #F8F870&lGiro Secuencial"
+  hex: "#F8F870"
+  permission: "effectos.sequentialspin"
+  preview: "#F8F870Giro Secuencial"
+
+desvanecimiento:
+  enable: true
+  material: PAPER
+  custom-model-data: 90000
+  skull-value: ''
+  display: "&b&lᴇғᴇᴄᴛᴏ › #F8F874&lDesvanecimiento"
+  hex: "#F8F874"
+  permission: "effectos.fade"
+  preview: "#F8F874Desvanecimiento"
+
+iteracion:
+  enable: true
+  material: PAPER
+  custom-model-data: 90000
+  skull-value: ''
+  display: "&b&lᴇғᴇᴄᴛᴏ › #F8F878&lIteración"
+  hex: "#F8F878"
+  permission: "effectos.iterating"
+  preview: "#F8F878Iteración"
+
+fallo:
+  enable: true
+  material: PAPER
+  custom-model-data: 90000
+  skull-value: ''
+  display: "&b&lᴇғᴇᴄᴛᴏ › #F8F87C&lFallo"
+  hex: "#F8F87C"
+  permission: "effectos.glitch"
+  preview: "#F8F87CFallo"
+
+escala:
+  enable: true
+  material: PAPER
+  custom-model-data: 90000
+  skull-value: ''
+  display: "&b&lᴇғᴇᴄᴛᴏ › #F8F880&lEscala"
+  hex: "#F8F880"
+  permission: "effectos.scale"
+  preview: "#F8F880Escala"
+
+desplazamiento:
+  enable: true
+  material: PAPER
+  custom-model-data: 90000
+  skull-value: ''
+  display: "&b&lᴇғᴇᴄᴛᴏ › #F8F884&lDesplazamiento"
+  hex: "#F8F884"
+  permission: "effectos.offset"
+  preview: "#F8F884Desplazamiento"
+
+division:
+  enable: true
+  material: PAPER
+  custom-model-data: 90000
+  skull-value: ''
+  display: "&b&lᴇғᴇᴄᴛᴏ › #F8F8A4&lDivisión"
+  hex: "#F8F8A4"
+  permission: "effectos.split"
+  preview: "#F8F8A4División"
+
+contorno:
+  enable: true
+  material: PAPER
+  custom-model-data: 90000
+  skull-value: ''
+  display: "&b&lᴇғᴇᴄᴛᴏ › #F8F8AC&lContorno"
+  hex: "#F8F8AC"
+  permission: "effectos.outline"
+  preview: "#F8F8ACContorno"
+
+neon:
+  enable: true
+  material: PAPER
+  custom-model-data: 90000
+  skull-value: ''
+  display: "&b&lᴇғᴇᴄᴛᴏ › #F8F8B4&lNeón"
+  hex: "#F8F8B4"
+  permission: "effectos.neon"
+  preview: "#F8F8B4Neón"
+
+extruido:
+  enable: true
+  material: PAPER
+  custom-model-data: 90000
+  skull-value: ''
+  display: "&b&lᴇғᴇᴄᴛᴏ › #F8F8C0&lExtruido"
+  hex: "#F8F8C0"
+  permission: "effectos.extrude"
+  preview: "#F8F8C0Extruido"
+
+ruido:
+  enable: true
+  material: PAPER
+  custom-model-data: 90000
+  skull-value: ''
+  display: "&b&lᴇғᴇᴄᴛᴏ › #F8F8C4&lRuido"
+  hex: "#F8F8C4"
+  permission: "effectos.noise"
+  preview: "#F8F8C4Ruido"
+

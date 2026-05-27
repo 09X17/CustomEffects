@@ -1,0 +1,27 @@
+name: CustomEffects
+version: 1.10.0
+main: com.customeffects.CustomEffects
+api-version: '1.21'
+author: 09X18 - AmplanNetwork
+depend: [PlaceholderAPI]
+
+commands:
+  effectos:
+    description: Abre el menú principal de efectos o gestiona vouchers.
+    usage: "§c¡Uso correcto! › §7/effectos [reload | givevoucher <jugador> <id_efecto>]"
+    permission: effectos.menu
+    aliases: [efectos, effects]
+
+permissions:
+  effectos.menu:
+    description: Permite abrir el menú de efectos a los usuarios.
+    default: true
+  effectos.reload:
+    description: Permite recargar la configuración del plugin.
+    default: op
+  effectos.admin:
+    description: Permite generar y dar vouchers de efectos a los jugadores.
+    default: op
+  effectos.chat.bypass:
+    description: Permite bypass el formato de chat personalizado del plugin.
+    default: op
