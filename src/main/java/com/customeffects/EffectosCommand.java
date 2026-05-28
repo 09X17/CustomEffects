@@ -20,6 +20,8 @@ import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import net.kyori.adventure.text.Component;
+
 import com.customeffects.utils.ColorUtils;
 
 public class EffectosCommand implements CommandExecutor, TabCompleter {
@@ -41,21 +43,6 @@ public class EffectosCommand implements CommandExecutor, TabCompleter {
             this.plugin.loadEffects();
             String msg = this.plugin.getConfig().getString("messages.reload-success", "%effectos_prefix%&aConfiguración y efectos recargados con éxito.");
             sender.sendMessage(ColorUtils.translate(resolvePrefix(msg)));
-            return true;
-        }
-
-        if (args.length >= 1 && args[0].equalsIgnoreCase("edit")) {
-            if (!(sender instanceof Player player)) {
-                sender.sendMessage("§cEste comando solo puede ser usado por jugadores.");
-                return true;
-            }
-            if (!player.hasPermission("effectos.admin")) {
-                String msg = this.plugin.getConfig().getString("messages.editor-no-permission", "%effectos_prefix%&cNo tienes permiso para usar el editor.");
-                player.sendMessage(ColorUtils.translate(resolvePrefix(msg)));
-                return true;
-            }
-            this.plugin.getEditingPlayers().put(player, null);
-            MenuCreator.openEditor(player, this.plugin);
             return true;
         }
 
@@ -180,14 +167,14 @@ public class EffectosCommand implements CommandExecutor, TabCompleter {
                 ItemMeta meta = item.getItemMeta();
 
                 if (meta != null) {
-                    meta.setDisplayName(ColorUtils.translate(resolvedDisplay));
+                    meta.displayName(ColorUtils.toComponent(resolvedDisplay));
 
-                    List<String> translatedLore = new ArrayList<>();
+                    List<Component> translatedLore = new ArrayList<>();
                     for (String line : rawLore) {
                         String resolvedLine = line.replace("{hex}", effectHex).replace("{name}", effectName);
-                        translatedLore.add(ColorUtils.translate(resolvedLine));
+                        translatedLore.add(ColorUtils.toComponent(resolvedLine));
                     }
-                    meta.setLore(translatedLore);
+                    meta.lore(translatedLore);
 
                     if (hasCustomModel) {
                         meta.setCustomModelData(customModelData);
@@ -212,9 +199,6 @@ public class EffectosCommand implements CommandExecutor, TabCompleter {
             String currentArg = args[0].toLowerCase();
             if (sender.hasPermission("effectos.reload") && "reload".startsWith(currentArg)) {
                 suggestions.add("reload");
-            }
-            if (sender.hasPermission("effectos.admin") && "edit".startsWith(currentArg)) {
-                suggestions.add("edit");
             }
             if (sender.hasPermission("effectos.admin") && "givevoucher".startsWith(currentArg)) {
                 suggestions.add("givevoucher");

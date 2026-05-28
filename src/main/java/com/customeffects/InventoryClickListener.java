@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Sound;
@@ -18,6 +17,9 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
 
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
+
 import com.customeffects.utils.ColorUtils;
 
 public class InventoryClickListener implements Listener {
@@ -26,6 +28,13 @@ public class InventoryClickListener implements Listener {
 
     public InventoryClickListener(CustomEffects plugin) {
         this.plugin = plugin;
+    }
+
+    private static String stripColors(String text) {
+        if (text == null) return null;
+        return PlainTextComponentSerializer.plainText().serialize(
+            LegacyComponentSerializer.legacySection().deserialize(text)
+        );
     }
 
     private Sound getSound(String configPath, Sound defaultSound) {
@@ -48,16 +57,13 @@ public class InventoryClickListener implements Listener {
     @EventHandler
     public void onClick(InventoryClickEvent event) {
         if (event.getClickedInventory() != null) {
-            String title = event.getView().getTitle();
+            String title = LegacyComponentSerializer.legacySection().serialize(event.getView().title());
             String mainTitle = this.plugin.getMainMenuTitle();
             boolean isMainMenu = title.equals(mainTitle);
             boolean isSubMenu = title.contains("Pág.");
             
             if (isMainMenu || isSubMenu) {
                 HumanEntity whoClicked = event.getWhoClicked();
-                if (whoClicked instanceof Player && this.plugin.getEditingPlayers().containsKey(whoClicked)) {
-                    return;
-                }
 
                 event.setCancelled(true);
                 
@@ -93,8 +99,8 @@ public class InventoryClickListener implements Listener {
         if (categories != null) {
             for (String key : categories.getKeys(false)) {
                 String display = ColorUtils.translate(config.getString("main-menu.categories." + key + ".display", key));
-                String cleanDisplay = ChatColor.stripColor(display);
-                String cleanTitle = ChatColor.stripColor(title);
+                String cleanDisplay = stripColors(display);
+                String cleanTitle = stripColors(title);
                 if (cleanTitle.contains(cleanDisplay) || cleanDisplay.contains(cleanTitle.split(" - ")[0])) {
                     categoryId = key;
                     break;

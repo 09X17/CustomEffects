@@ -100,20 +100,6 @@ reset-item:
   display: "&cᴇʟɪᴍɪɴᴀʀ ᴇғᴇᴄᴛᴏ ᴀᴄᴛɪᴠᴏ"
 
 # ==========================================
-#          EDITOR DE MENÚ (GUI)
-# ==========================================
-editor:
-  title: "&8&lEDITOR &7- Menú Principal"
-  blocker:
-    material: GRAY_STAINED_GLASS_PANE
-    custom-model-data: 0
-    display: "&c&lOCUPADO"
-    lore:
-      - "&7Slot bloqueado."
-      - "Mueve una categoría aquí"
-      - "para usar este slot."
-
-# ==========================================
 #          SISTEMA GLOBAL Y RECOMPENSAS
 # ==========================================
 
@@ -153,11 +139,6 @@ messages:
   voucher-given-sender: "%effectos_prefix%&aHas entregado 1x Voucher de &e{effect} &aa &f{player}&a."
   voucher-given-target: "%effectos_prefix%&a¡Has recibido un voucher para el efecto: &e{effect}&a!"
   voucher-corrupt: "%effectos_prefix%&cEste voucher está corrupto o el efecto ya no existe en la configuración."
-
-# === MENSAJES DEL EDITOR ===
-  editor-no-permission: "%effectos_prefix%&cNo tienes permiso para usar el editor."
-  editor-saved: "%effectos_prefix%&aMenú actualizado correctamente. Se guardaron &f{count} &acategorías."
-  editor-closed: "%effectos_prefix%&eEditor cerrado sin cambios."
 
 # ==========================================
 #         VOUCHER GLOBAL

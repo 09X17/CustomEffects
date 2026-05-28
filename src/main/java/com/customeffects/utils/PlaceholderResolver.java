@@ -1,20 +1,15 @@
 package com.customeffects.utils;
 
 import java.util.UUID;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.RegisteredServiceProvider;
 
 import com.customeffects.CustomEffects;
 
 import me.clip.placeholderapi.PlaceholderAPI;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 
 public class PlaceholderResolver {
-    private static final Pattern PAPI_PATTERN = Pattern.compile("%([^%]+)%");
-    private static final Pattern EFFECT_PLACEHOLDER_PATTERN = Pattern.compile("\\{([^}]+)\\}");
     private final CustomEffects plugin;
 
     public PlaceholderResolver(CustomEffects plugin) {
@@ -27,17 +22,15 @@ public class PlaceholderResolver {
         }
 
         String result = text;
-
         result = resolveEffectPlaceholders(result, player);
-
         if (plugin.getConfig().getBoolean("chat.placeholder-expansion.parse-papi-in-format", true)
                 && plugin.getServer().getPluginManager().getPlugin("PlaceholderAPI") != null) {
             result = PlaceholderAPI.setPlaceholders(player, result);
         }
-
-        result = result.replace("{player}", player.getDisplayName())
-                       .replace("{player_name}", player.getName());
-
+        String displayName = PlainTextComponentSerializer.plainText()
+                .serialize(player.displayName());
+        result = result.replace("{player}", displayName)
+                .replace("{player_name}", player.getName());
         return result;
     }
 
@@ -47,7 +40,7 @@ public class PlaceholderResolver {
         }
 
         UUID uuid = player.getUniqueId();
-        String effectId = plugin.getDatabase().getEffect(uuid);
+        String effectId = plugin.getDatabase().getActiveEffect(uuid);
         String hex = plugin.getDatabase().getHex(uuid);
 
         String effectName = getEffectName(effectId);
@@ -65,7 +58,7 @@ public class PlaceholderResolver {
     }
 
     public String resolvePrefix(Player player) {
-        String effectId = plugin.getDatabase().getEffect(player.getUniqueId());
+        String effectId = plugin.getDatabase().getActiveEffect(player.getUniqueId());
         String effectConfigPath = "chat.effects.per-effect-formats." + effectId;
 
         if (plugin.getConfig().contains(effectConfigPath + ".prefix")) {
@@ -86,7 +79,7 @@ public class PlaceholderResolver {
     }
 
     public String resolveSuffix(Player player) {
-        String effectId = plugin.getDatabase().getEffect(player.getUniqueId());
+        String effectId = plugin.getDatabase().getActiveEffect(player.getUniqueId());
         String effectConfigPath = "chat.effects.per-effect-formats." + effectId;
 
         if (plugin.getConfig().contains(effectConfigPath + ".suffix")) {
@@ -107,7 +100,7 @@ public class PlaceholderResolver {
     }
 
     public String resolveFormat(Player player, String message) {
-        String effectId = plugin.getDatabase().getEffect(player.getUniqueId());
+        String effectId = plugin.getDatabase().getActiveEffect(player.getUniqueId());
         String effectConfigPath = "chat.effects.per-effect-formats." + effectId;
 
         if (plugin.getConfig().contains(effectConfigPath + ".format")) {
@@ -151,9 +144,16 @@ public class PlaceholderResolver {
     }
 
     public boolean shouldOverrideFormat(Player player) {
-        if (player.hasPermission(plugin.getConfig().getString("chat.effects.bypass-permission", "effectos.chat.bypass"))) {
+        String permission = plugin.getConfig().getString(
+                "chat.effects.bypass-permission",
+                "effectos.chat.bypass");
+
+        if (permission != null && player.hasPermission(permission)) {
             return false;
         }
-        return plugin.getConfig().getBoolean("chat.effects.override-vault-format", true);
+
+        return plugin.getConfig().getBoolean(
+                "chat.effects.override-vault-format",
+                true);
     }
 }

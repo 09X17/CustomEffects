@@ -1,73 +1,93 @@
 package com.customeffects.utils;
 
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.jetbrains.annotations.NotNull;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
-import net.md_5.bungee.api.ChatColor;
 
 public class ColorUtils {
-    private static final Pattern HEX_PATTERN = Pattern.compile("#[a-fA-F0-9]{6}");
+    
+    private static final Pattern HEX_PATTERN = Pattern.compile("(?:&#|#)([0-9a-fA-F]{6})");
     private static final MiniMessage MINI_MESSAGE = MiniMessage.miniMessage();
     private static final LegacyComponentSerializer LEGACY_SERIALIZER = LegacyComponentSerializer.builder()
             .hexColors()
             .useUnusualXRepeatedCharacterHexFormat()
             .build();
 
-    public ColorUtils() {
+    @NotNull
+    public static String translate(@NotNull String message) {
+        if (message.isEmpty()) return "";
+        return LEGACY_SERIALIZER.serialize(toComponent(message));
     }
 
-    public static String translate(String message) {
-        if (message == null) {
-            return "";
-        } else {
-            for(Matcher matcher = HEX_PATTERN.matcher(message); matcher.find(); matcher = HEX_PATTERN.matcher(message)) {
-                String color = message.substring(matcher.start(), matcher.end());
-                message = message.replace(color, ChatColor.of(color).toString());
+    @NotNull
+    public static Component toComponent(@NotNull String message) {
+        if (message.isEmpty()) return Component.empty();
+        
+        String normalized = message.replace('§', '&');
+   
+        if (!normalized.contains("&") && normalized.contains("<")) {
+            return MINI_MESSAGE.deserialize(normalized);
+        }
+        
+        String converted = HEX_PATTERN.matcher(normalized).replaceAll("<#$1>");
+        
+        converted = convertLegacyToMiniMessage(converted);
+        
+        return MINI_MESSAGE.deserialize(converted);
+    }
+    
+    private static String convertLegacyToMiniMessage(String text) {
+        StringBuilder result = new StringBuilder();
+        int i = 0;
+        while (i < text.length()) {
+            if (i < text.length() - 1 && text.charAt(i) == '&') {
+                char code = text.charAt(i + 1);
+                String mmTag = getMiniMessageTag(code);
+                if (mmTag != null) {
+                    result.append("<").append(mmTag).append(">");
+                    i += 2;
+                    continue;
+                }
             }
-
-            return ChatColor.translateAlternateColorCodes('&', message);
+            result.append(text.charAt(i));
+            i++;
         }
+        return result.toString();
     }
-
-    public static String toMiniMessage(String hexColor, String text) {
-        if (hexColor == null || hexColor.isEmpty()) {
-            return text;
-        }
-        String cleanHex = hexColor.replace("§", "").replace("#", "").replace("&", "");
-        return "<#" + cleanHex + ">" + text + "</#>";
+    
+    private static String getMiniMessageTag(char code) {
+        return switch (Character.toLowerCase(code)) {
+            case '0' -> "black";
+            case '1' -> "dark_blue";
+            case '2' -> "dark_green";
+            case '3' -> "dark_aqua";
+            case '4' -> "dark_red";
+            case '5' -> "dark_purple";
+            case '6' -> "gold";
+            case '7' -> "gray";
+            case '8' -> "dark_gray";
+            case '9' -> "blue";
+            case 'a' -> "green";
+            case 'b' -> "aqua";
+            case 'c' -> "red";
+            case 'd' -> "light_purple";
+            case 'e' -> "yellow";
+            case 'f' -> "white";
+            case 'k' -> "obfuscated";
+            case 'l' -> "bold";
+            case 'm' -> "strikethrough";
+            case 'n' -> "underlined";
+            case 'o' -> "italic";
+            case 'r' -> "reset";
+            default -> null;
+        };
     }
-
-    public static String fromMiniMessage(String miniMessageText) {
-        if (miniMessageText == null || miniMessageText.isEmpty()) {
-            return "";
-        }
-        try {
-            Component component = MINI_MESSAGE.deserialize(miniMessageText);
-            return LEGACY_SERIALIZER.serialize(component);
-        } catch (Exception e) {
-            return translate(miniMessageText);
-        }
-    }
-
-    public static Component toComponent(String message) {
-        if (message == null || message.isEmpty()) {
-            return Component.empty();
-        }
-        try {
-            return MINI_MESSAGE.deserialize(message);
-        } catch (Exception e) {
-            String translated = translate(message);
-            return LEGACY_SERIALIZER.deserialize(translated);
-        }
-    }
-
-    public static String hexToMiniMessage(String hex) {
-        if (hex == null || hex.isEmpty()) {
-            return "<white>";
-        }
+    @NotNull
+    public static String hexToMiniMessage(@NotNull String hex) {
         String cleanHex = hex.replace("§", "").replace("#", "").replace("&", "");
         return "<#" + cleanHex + ">";
     }

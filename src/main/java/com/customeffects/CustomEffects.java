@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
@@ -16,7 +17,6 @@ import java.util.logging.Logger;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.customeffects.database.DatabaseManager;
@@ -30,7 +30,7 @@ public final class CustomEffects extends JavaPlugin {
     private int subMenuSize;
     private final Map<String, List<String>> categoryEffects = new HashMap<>();
     private final Map<String, Map<String, Map<String, String>>> effectData = new HashMap<>();
-    private final Map<Player, String> editingPlayers = new HashMap<>();
+
 
     public CustomEffects() {
     }
@@ -41,24 +41,24 @@ public final class CustomEffects extends JavaPlugin {
         this.saveCategoryFiles();
         this.updateConfigCommentsSafe();
         this.loadPluginData();
-        
-        this.database = new DatabaseManager(this.getLogger());
+
+        this.database = new DatabaseManager();
         this.database.connect(this.getDataFolder());
-        
-        // Registro de Listeners 
+
         this.getServer().getPluginManager().registerEvents(new InventoryClickListener(this), this);
         this.getServer().getPluginManager().registerEvents(new PlayerListener(this), this);
         this.getServer().getPluginManager().registerEvents(new VoucherListener(this), this);
-        this.getServer().getPluginManager().registerEvents(new EditorListener(this, this.editingPlayers), this);
-        
-        // Registro de Comando Principal
+
+
         EffectosCommand commandExecutor = new EffectosCommand(this);
-        if (this.getCommand("effectos") != null) {
-            this.getCommand("effectos").setExecutor(commandExecutor);
-            this.getCommand("effectos").setTabCompleter(commandExecutor);
+        var command = this.getCommand("effectos");
+        if (command != null) {
+            command.setExecutor(commandExecutor);
+            command.setTabCompleter(commandExecutor);
+        } else {
+            this.getLogger().severe("El comando 'effectos' no está registrado en plugin.yml");
         }
 
-        // Integración con PlaceholderAPI
         if (this.getServer().getPluginManager().getPlugin("PlaceholderAPI") != null) {
             new EffectosExpansion(this).register();
             this.getLogger().info("PlaceholderAPI conectado correctamente.");
@@ -80,29 +80,35 @@ public final class CustomEffects extends JavaPlugin {
     private void updateConfigCommentsSafe() {
         try {
             File configFile = new File(this.getDataFolder(), "config.yml");
-            if (!configFile.exists()) return;
+            if (!configFile.exists())
+                return;
 
             FileConfiguration userConfig = this.getConfig();
 
-            try (InputStreamReader jarReader = new InputStreamReader(this.getResource("config.yml"), StandardCharsets.UTF_8)) {
+            try (InputStreamReader jarReader = new InputStreamReader(this.getResource("config.yml"),
+                    StandardCharsets.UTF_8)) {
                 YamlConfiguration jarConfig = YamlConfiguration.loadConfiguration(jarReader);
-                
+
                 boolean necesitaActualizacion = false;
-                
+
                 for (String key : jarConfig.getKeys(true)) {
                     if (!userConfig.contains(key)) {
                         necesitaActualizacion = true;
                         break;
                     }
                 }
-                
-                if (!necesitaActualizacion) return;
-                
-                this.getLogger().info("Detectadas nuevas opciones en la actualización. Inyectando sin alterar comentarios...");
 
-                try (BufferedReader reader = new BufferedReader(new InputStreamReader(this.getResource("config.yml"), StandardCharsets.UTF_8));
-                     BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(configFile, true), StandardCharsets.UTF_8))) {
-                    
+                if (!necesitaActualizacion)
+                    return;
+
+                this.getLogger()
+                        .info("Detectadas nuevas opciones en la actualización. Inyectando sin alterar comentarios...");
+
+                try (BufferedReader reader = new BufferedReader(
+                        new InputStreamReader(this.getResource("config.yml"), StandardCharsets.UTF_8));
+                        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(
+                                new FileOutputStream(configFile, true), StandardCharsets.UTF_8))) {
+
                     String line;
                     String currentSection = "";
                     boolean escribiendoNuevaSeccion = false;
@@ -117,7 +123,7 @@ public final class CustomEffects extends JavaPlugin {
 
                     while ((line = reader.readLine()) != null) {
                         String trimmed = line.trim();
-                        
+
                         if (trimmed.startsWith("#") || trimmed.isEmpty()) {
                             if (escribiendoNuevaSeccion) {
                                 writer.write(line);
@@ -146,22 +152,23 @@ public final class CustomEffects extends JavaPlugin {
                         }
                     }
                 }
-                
+
                 this.reloadConfig();
                 this.getLogger().info("¡Archivo config.yml actualizado con éxito!");
             }
-        } catch (Exception e) {
-            this.getLogger().severe("No se pudo procesar la actualización automática de la config: " + e.getMessage());
+        } catch (IOException e) {
+            this.getLogger().log(java.util.logging.Level.SEVERE, "Error: {0}", e.getMessage());
         }
     }
 
     public void loadPluginData() {
         this.categoryEffects.clear();
         this.effectData.clear();
-        this.mainMenuTitle = ColorUtils.translate(this.getConfig().getString("main-menu.title", "&8Categorías de Efectos"));
+        this.mainMenuTitle = ColorUtils
+                .translate(this.getConfig().getString("main-menu.title", "&8Categorías de Efectos"));
         this.mainMenuSize = this.getConfig().getInt("main-menu.size", 27);
         this.subMenuSize = this.getConfig().getInt("subcategory-menu.size", 54);
-        
+
         ConfigurationSection categoriesSection = this.getConfig().getConfigurationSection("main-menu.categories");
         if (categoriesSection == null) {
             this.getLogger().warning("No se encontró la sección 'main-menu.categories' en la config.yml");
@@ -174,7 +181,10 @@ public final class CustomEffects extends JavaPlugin {
         for (String categoryKey : categoriesSection.getKeys(false)) {
             File categoryFile = new File(categoriesFolder, categoryKey + ".yml");
             if (!categoryFile.exists()) {
-                this.getLogger().warning("No se encontró el archivo de categoría: categories/" + categoryKey + ".yml");
+                this.getLogger().log(
+                        java.util.logging.Level.WARNING,
+                        "No se encontró el archivo de categoría: categories/{0}.yml",
+                        categoryKey);
                 continue;
             }
 
@@ -198,13 +208,13 @@ public final class CustomEffects extends JavaPlugin {
                     effectInfo.put("custom-model-data", categoryConfig.getString(effectKey + ".custom-model-data", ""));
                     effectInfo.put("slot", categoryConfig.getString(effectKey + ".slot", ""));
                     effectInfo.put("skull-value", categoryConfig.getString(effectKey + ".skull-value", ""));
-                    
+
                     if (categoryConfig.contains(effectKey + ".lore")) {
                         effectInfo.put("has-custom-lore", "true");
                     } else {
                         effectInfo.put("has-custom-lore", "false");
                     }
-                    
+
                     categoryEffectMap.put(effectKey, effectInfo);
                     ++totalEfectos;
                 }
@@ -216,7 +226,10 @@ public final class CustomEffects extends JavaPlugin {
 
         Logger logger = this.getLogger();
         int totalCategorias = this.categoryEffects.size();
-        logger.info("Se han indexado " + totalCategorias + " categorías con un total de " + totalEfectos + " efectos.");
+        logger.log(
+                java.util.logging.Level.INFO,
+                "Se han indexado {0} categorías con un total de {1} efectos.",
+                new Object[] { totalCategorias, totalEfectos });
     }
 
     private void saveCategoryFiles() {
@@ -225,7 +238,7 @@ public final class CustomEffects extends JavaPlugin {
             categoriesFolder.mkdirs();
         }
 
-        String[] categoryFiles = {"rainbows.yml", "basic_colors.yml", "mechanics.yml"};
+        String[] categoryFiles = { "rainbows.yml", "basic_colors.yml", "mechanics.yml" };
         for (String fileName : categoryFiles) {
             File file = new File(categoriesFolder, fileName);
             if (!file.exists()) {
@@ -297,7 +310,4 @@ public final class CustomEffects extends JavaPlugin {
         return this.getConfig().getStringList("default-lore");
     }
 
-    public Map<Player, String> getEditingPlayers() {
-        return this.editingPlayers;
-    }
 }
