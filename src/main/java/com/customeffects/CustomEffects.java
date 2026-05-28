@@ -5,6 +5,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
@@ -12,6 +13,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.bukkit.configuration.ConfigurationSection;
@@ -31,8 +33,12 @@ public final class CustomEffects extends JavaPlugin {
     private final Map<String, List<String>> categoryEffects = new HashMap<>();
     private final Map<String, Map<String, Map<String, String>>> effectData = new HashMap<>();
 
-
     public CustomEffects() {
+    }
+
+    private String cfg(String path, String def) {
+        String value = this.getConfig().getString(path, def);
+        return value != null ? value : def;
     }
 
     @Override
@@ -48,7 +54,6 @@ public final class CustomEffects extends JavaPlugin {
         this.getServer().getPluginManager().registerEvents(new InventoryClickListener(this), this);
         this.getServer().getPluginManager().registerEvents(new PlayerListener(this), this);
         this.getServer().getPluginManager().registerEvents(new VoucherListener(this), this);
-
 
         EffectosCommand commandExecutor = new EffectosCommand(this);
         var command = this.getCommand("effectos");
@@ -80,17 +85,20 @@ public final class CustomEffects extends JavaPlugin {
     private void updateConfigCommentsSafe() {
         try {
             File configFile = new File(this.getDataFolder(), "config.yml");
-            if (!configFile.exists())
-                return;
+            if (!configFile.exists()) return;
 
             FileConfiguration userConfig = this.getConfig();
 
-            try (InputStreamReader jarReader = new InputStreamReader(this.getResource("config.yml"),
-                    StandardCharsets.UTF_8)) {
+            InputStream jarResourceStream = this.getResource("config.yml");
+            if (jarResourceStream == null) {
+                this.getLogger().warning("No se encontró config.yml en el jar.");
+                return;
+            }
+
+            try (InputStreamReader jarReader = new InputStreamReader(jarResourceStream, StandardCharsets.UTF_8)) {
                 YamlConfiguration jarConfig = YamlConfiguration.loadConfiguration(jarReader);
 
                 boolean necesitaActualizacion = false;
-
                 for (String key : jarConfig.getKeys(true)) {
                     if (!userConfig.contains(key)) {
                         necesitaActualizacion = true;
@@ -98,16 +106,20 @@ public final class CustomEffects extends JavaPlugin {
                     }
                 }
 
-                if (!necesitaActualizacion)
-                    return;
+                if (!necesitaActualizacion) return;
 
-                this.getLogger()
-                        .info("Detectadas nuevas opciones en la actualización. Inyectando sin alterar comentarios...");
+                this.getLogger().info("Detectadas nuevas opciones en la actualización. Inyectando sin alterar comentarios...");
+
+                InputStream readerStream = this.getResource("config.yml");
+                if (readerStream == null) {
+                    this.getLogger().warning("No se pudo releer config.yml del jar.");
+                    return;
+                }
 
                 try (BufferedReader reader = new BufferedReader(
-                        new InputStreamReader(this.getResource("config.yml"), StandardCharsets.UTF_8));
-                        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(
-                                new FileOutputStream(configFile, true), StandardCharsets.UTF_8))) {
+                        new InputStreamReader(readerStream, StandardCharsets.UTF_8));
+                     BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(
+                             new FileOutputStream(configFile, true), StandardCharsets.UTF_8))) {
 
                     String line;
                     String currentSection = "";
@@ -136,7 +148,6 @@ public final class CustomEffects extends JavaPlugin {
                             currentSection = line.split(":")[0];
                             escribiendoNuevaSeccion = !userConfig.contains(currentSection);
                         } else if (trimmed.contains(":") && !escribiendoNuevaSeccion) {
-
                             String fullPath = currentSection + "." + trimmed.split(":")[0];
                             if (userConfig.contains(fullPath)) {
                                 escribiendoNuevaSeccion = false;
@@ -157,15 +168,15 @@ public final class CustomEffects extends JavaPlugin {
                 this.getLogger().info("¡Archivo config.yml actualizado con éxito!");
             }
         } catch (IOException e) {
-            this.getLogger().log(java.util.logging.Level.SEVERE, "Error: {0}", e.getMessage());
+            this.getLogger().log(Level.SEVERE, "Error al actualizar config.yml: {0}", e.getMessage());
         }
     }
 
     public void loadPluginData() {
         this.categoryEffects.clear();
         this.effectData.clear();
-        this.mainMenuTitle = ColorUtils
-                .translate(this.getConfig().getString("main-menu.title", "&8Categorías de Efectos"));
+
+        this.mainMenuTitle = ColorUtils.translate(cfg("main-menu.title", "&8Categorías de Efectos"));
         this.mainMenuSize = this.getConfig().getInt("main-menu.size", 27);
         this.subMenuSize = this.getConfig().getInt("subcategory-menu.size", 54);
 
@@ -181,10 +192,8 @@ public final class CustomEffects extends JavaPlugin {
         for (String categoryKey : categoriesSection.getKeys(false)) {
             File categoryFile = new File(categoriesFolder, categoryKey + ".yml");
             if (!categoryFile.exists()) {
-                this.getLogger().log(
-                        java.util.logging.Level.WARNING,
-                        "No se encontró el archivo de categoría: categories/{0}.yml",
-                        categoryKey);
+                this.getLogger().log(Level.WARNING,
+                        "No se encontró el archivo de categoría: categories/{0}.yml", categoryKey);
                 continue;
             }
 
@@ -193,31 +202,24 @@ public final class CustomEffects extends JavaPlugin {
             Map<String, Map<String, String>> categoryEffectMap = new HashMap<>();
 
             for (String effectKey : categoryConfig.getKeys(false)) {
-                if (categoryConfig.isConfigurationSection(effectKey)) {
-                    if (!categoryConfig.getBoolean(effectKey + ".enable", true)) {
-                        continue;
-                    }
+                if (!categoryConfig.isConfigurationSection(effectKey)) continue;
+                if (!categoryConfig.getBoolean(effectKey + ".enable", true)) continue;
 
-                    effectIDs.add(effectKey);
-                    Map<String, String> effectInfo = new HashMap<>();
-                    effectInfo.put("display", categoryConfig.getString(effectKey + ".display", effectKey));
-                    effectInfo.put("hex", categoryConfig.getString(effectKey + ".hex", "#FFFFFF"));
-                    effectInfo.put("permission", categoryConfig.getString(effectKey + ".permission", ""));
-                    effectInfo.put("preview", categoryConfig.getString(effectKey + ".preview", effectKey));
-                    effectInfo.put("material", categoryConfig.getString(effectKey + ".material", "PAPER"));
-                    effectInfo.put("custom-model-data", categoryConfig.getString(effectKey + ".custom-model-data", ""));
-                    effectInfo.put("slot", categoryConfig.getString(effectKey + ".slot", ""));
-                    effectInfo.put("skull-value", categoryConfig.getString(effectKey + ".skull-value", ""));
+                effectIDs.add(effectKey);
 
-                    if (categoryConfig.contains(effectKey + ".lore")) {
-                        effectInfo.put("has-custom-lore", "true");
-                    } else {
-                        effectInfo.put("has-custom-lore", "false");
-                    }
+                Map<String, String> effectInfo = new HashMap<>();
+                effectInfo.put("display",          cfgSection(categoryConfig, effectKey + ".display", effectKey));
+                effectInfo.put("hex",               cfgSection(categoryConfig, effectKey + ".hex", "#FFFFFF"));
+                effectInfo.put("permission",        cfgSection(categoryConfig, effectKey + ".permission", ""));
+                effectInfo.put("preview",           cfgSection(categoryConfig, effectKey + ".preview", effectKey));
+                effectInfo.put("material",          cfgSection(categoryConfig, effectKey + ".material", "PAPER"));
+                effectInfo.put("custom-model-data", cfgSection(categoryConfig, effectKey + ".custom-model-data", ""));
+                effectInfo.put("slot",              cfgSection(categoryConfig, effectKey + ".slot", ""));
+                effectInfo.put("skull-value",       cfgSection(categoryConfig, effectKey + ".skull-value", ""));
+                effectInfo.put("has-custom-lore",   categoryConfig.contains(effectKey + ".lore") ? "true" : "false");
 
-                    categoryEffectMap.put(effectKey, effectInfo);
-                    ++totalEfectos;
-                }
+                categoryEffectMap.put(effectKey, effectInfo);
+                ++totalEfectos;
             }
 
             this.categoryEffects.put(categoryKey, effectIDs);
@@ -225,26 +227,29 @@ public final class CustomEffects extends JavaPlugin {
         }
 
         Logger logger = this.getLogger();
-        int totalCategorias = this.categoryEffects.size();
-        logger.log(
-                java.util.logging.Level.INFO,
+        logger.log(Level.INFO,
                 "Se han indexado {0} categorías con un total de {1} efectos.",
-                new Object[] { totalCategorias, totalEfectos });
+                new Object[]{ this.categoryEffects.size(), totalEfectos });
     }
 
     private void saveCategoryFiles() {
         File categoriesFolder = new File(this.getDataFolder(), "categories");
-        if (!categoriesFolder.exists()) {
-            categoriesFolder.mkdirs();
+        if (!categoriesFolder.exists() && !categoriesFolder.mkdirs()) { 
+            this.getLogger().severe("No se pudo crear la carpeta 'categories'.");
+            return;
         }
 
-        String[] categoryFiles = { "rainbows.yml", "basic_colors.yml", "mechanics.yml" };
-        for (String fileName : categoryFiles) {
+        for (String fileName : new String[]{ "rainbows.yml", "basic_colors.yml", "mechanics.yml" }) {
             File file = new File(categoriesFolder, fileName);
             if (!file.exists()) {
                 this.saveResource("categories/" + fileName, false);
             }
         }
+    }
+
+    private static String cfgSection(org.bukkit.configuration.ConfigurationSection section, String path, String def) {
+        String value = section.getString(path, def);
+        return value != null ? value : def;
     }
 
     public void loadEffects() {
@@ -309,5 +314,4 @@ public final class CustomEffects extends JavaPlugin {
     public List<String> getDefaultLore() {
         return this.getConfig().getStringList("default-lore");
     }
-
 }

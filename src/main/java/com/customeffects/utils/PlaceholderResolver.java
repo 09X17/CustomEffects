@@ -2,6 +2,7 @@ package com.customeffects.utils;
 
 import java.util.UUID;
 
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
 import com.customeffects.CustomEffects;
@@ -14,6 +15,11 @@ public class PlaceholderResolver {
 
     public PlaceholderResolver(CustomEffects plugin) {
         this.plugin = plugin;
+    }
+
+    private String cfg(String path, String def) {
+        String value = plugin.getConfig().getString(path, def);
+        return value != null ? value : def;
     }
 
     public String resolvePlaceholders(String text, Player player) {
@@ -62,7 +68,7 @@ public class PlaceholderResolver {
         String effectConfigPath = "chat.effects.per-effect-formats." + effectId;
 
         if (plugin.getConfig().contains(effectConfigPath + ".prefix")) {
-            String prefix = plugin.getConfig().getString(effectConfigPath + ".prefix", "");
+            String prefix = cfg(effectConfigPath + ".prefix", "");
             return resolvePlaceholders(prefix, player);
         }
 
@@ -70,11 +76,11 @@ public class PlaceholderResolver {
             return "";
         }
 
-        String format = plugin.getConfig().getString("chat.prefix.format", "[{effect_name}]");
         if (effectId == null || effectId.isEmpty()) {
-            return ColorUtils.translate(plugin.getConfig().getString("chat.prefix.no-effect", ""));
+            return ColorUtils.translate(cfg("chat.prefix.no-effect", ""));
         }
 
+        String format = cfg("chat.prefix.format", "[{effect_name}]");
         return resolvePlaceholders(format, player);
     }
 
@@ -83,7 +89,7 @@ public class PlaceholderResolver {
         String effectConfigPath = "chat.effects.per-effect-formats." + effectId;
 
         if (plugin.getConfig().contains(effectConfigPath + ".suffix")) {
-            String suffix = plugin.getConfig().getString(effectConfigPath + ".suffix", "");
+            String suffix = cfg(effectConfigPath + ".suffix", "");
             return resolvePlaceholders(suffix, player);
         }
 
@@ -91,11 +97,11 @@ public class PlaceholderResolver {
             return "";
         }
 
-        String format = plugin.getConfig().getString("chat.suffix.format", "");
         if (effectId == null || effectId.isEmpty()) {
-            return ColorUtils.translate(plugin.getConfig().getString("chat.suffix.no-effect", ""));
+            return ColorUtils.translate(cfg("chat.suffix.no-effect", ""));
         }
 
+        String format = cfg("chat.suffix.format", "");
         return resolvePlaceholders(format, player);
     }
 
@@ -104,35 +110,37 @@ public class PlaceholderResolver {
         String effectConfigPath = "chat.effects.per-effect-formats." + effectId;
 
         if (plugin.getConfig().contains(effectConfigPath + ".format")) {
-            String format = plugin.getConfig().getString(effectConfigPath + ".format", "");
+            String format = cfg(effectConfigPath + ".format", "");
             String resolved = resolvePlaceholders(format, player);
             return resolved.replace("{message}", message);
         }
 
-        String format = plugin.getConfig().getString("chat.format", "{prefix} {player} &7» {message}");
+        String format = cfg("chat.format", "{prefix} {player} &7» {message}");
         String resolved = resolvePlaceholders(format, player);
         return resolved.replace("{message}", message);
     }
 
     private String getEffectName(String effectId) {
         if (effectId == null || effectId.isEmpty()) {
-            return ColorUtils.translate(plugin.getConfig().getString("messages.no-effect-name", "&cNinguno"));
+            return ColorUtils.translate(cfg("messages.no-effect-name", "&cNinguno"));
         }
-        return ColorUtils.translate(plugin.getEffectDisplay(effectId));
+        String display = plugin.getEffectDisplay(effectId);
+        return ColorUtils.translate(display != null ? display : effectId);
     }
 
     private String getEffectPreview(String effectId) {
         if (effectId == null || effectId.isEmpty()) {
-            return ColorUtils.translate(plugin.getConfig().getString("messages.no-effect-preview", "&cSin Efecto"));
+            return ColorUtils.translate(cfg("messages.no-effect-preview", "&cSin Efecto"));
         }
 
-        var categoriesSection = plugin.getConfig().getConfigurationSection("main-menu.categories");
+        ConfigurationSection categoriesSection = plugin.getConfig()
+                .getConfigurationSection("main-menu.categories");
         if (categoriesSection != null) {
             for (String category : categoriesSection.getKeys(false)) {
                 var categoryConfig = plugin.getCategoryConfig(category);
                 if (categoryConfig != null && categoryConfig.contains(effectId)) {
                     String preview = categoryConfig.getString(effectId + ".preview", effectId);
-                    return ColorUtils.translate(preview);
+                    return ColorUtils.translate(preview != null ? preview : effectId);
                 }
             }
         }
@@ -140,20 +148,17 @@ public class PlaceholderResolver {
     }
 
     public boolean hasPerEffectFormat(String effectId) {
-        return effectId != null && plugin.getConfig().contains("chat.effects.per-effect-formats." + effectId);
+        return effectId != null && plugin.getConfig()
+                .contains("chat.effects.per-effect-formats." + effectId);
     }
 
     public boolean shouldOverrideFormat(Player player) {
-        String permission = plugin.getConfig().getString(
-                "chat.effects.bypass-permission",
-                "effectos.chat.bypass");
+        String permission = cfg("chat.effects.bypass-permission", "effectos.chat.bypass");
 
-        if (permission != null && player.hasPermission(permission)) {
+        if (player.hasPermission(permission)) {
             return false;
         }
 
-        return plugin.getConfig().getBoolean(
-                "chat.effects.override-vault-format",
-                true);
+        return plugin.getConfig().getBoolean("chat.effects.override-vault-format", true);
     }
 }

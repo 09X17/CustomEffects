@@ -120,15 +120,16 @@ public class EffectosExpansion extends PlaceholderExpansion {
 
     private String getEffectName(String effectId) {
         if (effectId == null || effectId.isEmpty()) {
-            return ColorUtils.translate(this.plugin.getConfig().getString("messages.no-effect-name", "&cNinguno"));
+            String msg = this.plugin.getConfig().getString("messages.no-effect-name", "&cNinguno");
+            return ColorUtils.translate(msg != null ? msg : "&cNinguno");
         }
         return ColorUtils.translate(this.plugin.getEffectDisplay(effectId));
     }
 
     private String getEffectPreview(String effectId) {
         if (effectId == null || effectId.isEmpty()) {
-            return ColorUtils
-                    .translate(this.plugin.getConfig().getString("messages.no-effect-preview", "&cSin Efecto"));
+            String msg = this.plugin.getConfig().getString("messages.no-effect-preview", "&cSin Efecto");
+            return ColorUtils.translate(msg != null ? msg : "&cSin Efecto");
         }
 
         ConfigurationSection categoriesSection = this.plugin.getConfig()
@@ -138,7 +139,7 @@ public class EffectosExpansion extends PlaceholderExpansion {
                 YamlConfiguration categoryConfig = this.plugin.getCategoryConfig(category);
                 if (categoryConfig != null && categoryConfig.contains(effectId)) {
                     String preview = categoryConfig.getString(effectId + ".preview", effectId);
-                    return ColorUtils.translate(preview);
+                    return ColorUtils.translate(preview != null ? preview : effectId);
                 }
             }
         }

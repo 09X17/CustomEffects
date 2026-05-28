@@ -17,14 +17,13 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
 
+import com.customeffects.utils.ColorUtils;
+
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 
-import com.customeffects.utils.ColorUtils;
-
 public class InventoryClickListener implements Listener {
     private final CustomEffects plugin;
-    private static final int ITEMS_PER_PAGE = 45;
 
     public InventoryClickListener(CustomEffects plugin) {
         this.plugin = plugin;

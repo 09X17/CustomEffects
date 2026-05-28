@@ -1,5 +1,6 @@
 package com.customeffects.utils;
 
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.util.Base64;
 import java.util.UUID;
@@ -24,25 +25,31 @@ public class SkullUtils {
 
         try {
             String decoded = new String(Base64.getDecoder().decode(textureValue));
-            String textureUrl = decoded.replaceAll(".*\"SKIN\"\\s*:\\s*\\{\\s*\"url\"\\s*:\\s*\"([^\"]+)\".*", "$1");
+            String textureUrl = decoded.replaceAll(
+                ".*\"SKIN\"\\s*:\\s*\\{\\s*\"url\"\\s*:\\s*\"([^\"]+)\".*", "$1"
+            );
 
-                PlayerProfile profile = Bukkit.createProfile(UUID.randomUUID());
+            PlayerProfile profile = Bukkit.createProfile(UUID.randomUUID());
             PlayerTextures textures = profile.getTextures();
-            textures.setSkin(URI.create(textureUrl).toURL());
+            textures.setSkin(URI.create(textureUrl).toURL()); 
             profile.setTextures(textures);
 
             skullMeta.setOwnerProfile(profile);
             item.setItemMeta(skullMeta);
-        } catch (Exception e) {
+
+        } catch (MalformedURLException | IllegalArgumentException e) { 
             try {
                 PlayerProfile profile = Bukkit.createProfile(UUID.randomUUID());
                 PlayerTextures textures = profile.getTextures();
-                textures.setSkin(URI.create("http://textures.minecraft.net/texture/" + textureValue).toURL());
+                textures.setSkin(URI.create(
+                    "http://textures.minecraft.net/texture/" + textureValue
+                ).toURL());
                 profile.setTextures(textures);
 
                 skullMeta.setOwnerProfile(profile);
                 item.setItemMeta(skullMeta);
-            } catch (Exception ignored) {
+
+            } catch (MalformedURLException | IllegalArgumentException ignored) { 
             }
         }
     }
