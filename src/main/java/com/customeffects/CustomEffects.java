@@ -49,7 +49,7 @@ public final class CustomEffects extends JavaPlugin {
         this.loadPluginData();
 
         this.database = new DatabaseManager();
-        this.database.connect(this.getDataFolder());
+        this.database.connect(this.getDataFolder(), this);
 
         this.getServer().getPluginManager().registerEvents(new InventoryClickListener(this), this);
         this.getServer().getPluginManager().registerEvents(new PlayerListener(this), this);
@@ -64,7 +64,15 @@ public final class CustomEffects extends JavaPlugin {
             this.getLogger().severe("El comando 'effectos' no está registrado en plugin.yml");
         }
 
-        if (this.getServer().getPluginManager().getPlugin("PlaceholderAPI") != null) {
+        FormatoCommand formatoCommand = new FormatoCommand(this);
+        var formatoCmd = this.getCommand("formato");
+        if (formatoCmd != null) {
+            formatoCmd.setExecutor(formatoCommand);
+        } else {
+            this.getLogger().severe("El comando 'formato' no está registrado en plugin.yml");
+        }
+
+        if (this.getServer().getPluginManager().isPluginEnabled("PlaceholderAPI")) {
             new EffectosExpansion(this).register();
             this.getLogger().info("PlaceholderAPI conectado correctamente.");
         } else {

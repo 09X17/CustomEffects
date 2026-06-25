@@ -4,6 +4,22 @@
 prefix: "#a10100&lE#b41301&lF#c72403&lE#da3604&lC#e64607&lT#f2550a&lO#fe650d&lS&r &7➛  "
 
 # ==========================================
+#         BASE DE DATOS
+#    Tipo: sqlite (local) o mysql (multi-server)
+#    Si usas mysql, todos los servers compartirán
+#    los mismos datos de efectos y formatos.
+# ==========================================
+database:
+  type: "sqlite"
+  mysql:
+    host: "127.0.0.1"
+    port: 3306
+    database: "customeffects"
+    username: "root"
+    password: ""
+    table-prefix: "ce_"
+
+# ==========================================
 #         LORE POR DEFECTO
 # ==========================================
 default-lore:
@@ -26,6 +42,7 @@ main-menu:
       material: PAPER
       custom-model-data: 90005
       display: "#F8F85C&nᴇғᴇᴄᴛᴏs ᴅɪɴáᴍɪᴄᴏs"
+      display-submenu: "<glyph:nexoid> #F8F85C&nᴇғᴇᴄᴛᴏs ᴅɪɴáᴍɪᴄᴏs"
       lore:
         - ""
         - " &d✴&n ᴅᴇsᴄʀɪᴘᴄɪóɴ:"
@@ -92,6 +109,18 @@ navigation:
     display: "&cᴠᴏʟᴠᴇʀ ᴀʟ ᴍᴇɴú ᴘʀɪɴᴄɪᴘᴀʟ"
     lore:
       - "&r "
+
+format-button:
+  slot: 46
+  material: PAPER
+  custom-model-data: 1203
+  display: "&b✦ ғᴏʀᴍᴀᴛᴏ ᴅᴇ ᴛᴇxᴛᴏ"
+  lore:
+    - ""
+    - " &7▸ Elige el estilo"
+    - " &7  para tu efecto"
+    - ""
+    - " &e✦ Click para abrir"
 
 reset-item:
   slot: 49
@@ -171,3 +200,113 @@ global-voucher:
 #    CATEGORÍAS DE EFECTOS (archivos externos)
 #    Los efectos se cargan desde: plugins/CustomEffects/categories/<nombre>.yml
 # ==========================================
+
+# ==========================================
+#         MENÚ DE FORMATOS DE TEXTO
+#    Accesible con el comando /formato
+#    Permite elegir Bold, Underline, Italic
+#    y sus combinaciones.
+# ==========================================
+format-menu:
+  title: "&8&lFORMATOS &7- &fEstilo de Texto"
+  size: 27
+  items:
+    none:
+      slot: 10
+      material: BARRIER
+      display: "&c&lSin Formato"
+      lore:
+        - ""
+        - " &7▸ Elimina cualquier"
+        - " &7  formato de texto"
+        - ""
+        - " &e✦ Click para seleccionar"
+      style: ""
+    bold:
+      slot: 11
+      material: PAPER
+      custom-model-data: 90010
+      display: "&l&nBold &7(Negrita)"
+      lore:
+        - ""
+        - " &7▸ Texto en &l&nnegrita"
+        - ""
+        - " &e✦ Click para seleccionar"
+      style: "bold"
+    underline:
+      slot: 12
+      material: PAPER
+      custom-model-data: 90011
+      display: "&nUnderline &7(Subrayado)"
+      lore:
+        - ""
+        - " &7▸ Texto &nsubrayado"
+        - ""
+        - " &e✦ Click para seleccionar"
+      style: "underline"
+    italic:
+      slot: 13
+      material: PAPER
+      custom-model-data: 90012
+      display: "&oItalic &7(Cursiva)"
+      lore:
+        - ""
+        - " &7▸ Texto en &ocursiva"
+        - ""
+        - " &e✦ Click para seleccionar"
+      style: "italic"
+    bold_underline:
+      slot: 14
+      material: PAPER
+      custom-model-data: 90013
+      display: "&l&nBold+Underline"
+      lore:
+        - ""
+        - " &7▸ Texto en &l&nnegrita"
+        - " &7  y subrayado"
+        - ""
+        - " &e✦ Click para seleccionar"
+      style: "bold_underline"
+    bold_italic:
+      slot: 15
+      material: PAPER
+      custom-model-data: 90014
+      display: "&l&oBold+Italic"
+      lore:
+        - ""
+        - " &7▸ Texto en &l&onegrita"
+        - " &7  y cursiva"
+        - ""
+        - " &e✦ Click para seleccionar"
+      style: "bold_italic"
+    underline_italic:
+      slot: 16
+      material: PAPER
+      custom-model-data: 90015
+      display: "&n&oUnderline+Italic"
+      lore:
+        - ""
+        - " &7▸ Texto &n&osubrayado"
+        - " &7  y cursiva"
+        - ""
+        - " &e✦ Click para seleccionar"
+      style: "underline_italic"
+    bold_underline_italic:
+      slot: 17
+      material: PAPER
+      custom-model-data: 90016
+      display: "&l&n&oBold+Underline+Italic"
+      lore:
+        - ""
+        - " &7▸ Texto en &l&n&onegrita,"
+        - " &7  subrayado y cursiva"
+        - ""
+        - " &e✦ Click para seleccionar"
+      style: "bold_underline_italic"
+
+  sounds:
+    select: "UI_BUTTON_CLICK"
+
+  messages:
+    style-set: "%effectos_prefix%&aFormato cambiado a: &f{style}"
+    style-reset: "%effectos_prefix%&cFormato eliminado."

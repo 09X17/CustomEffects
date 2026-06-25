@@ -1,9 +1,9 @@
 name: CustomEffects
-version: 2.0.0
+version: 2.1.0
 main: com.customeffects.CustomEffects
 api-version: '1.21'
 author: 09X18 - AmplanNetwork
-depend: [PlaceholderAPI]
+softdepend: ["PlaceholderAPI"]
 
 commands:
   effectos:
@@ -11,6 +11,11 @@ commands:
     usage: "§c¡Uso correcto! › §7/effectos [reload | givevoucher <jugador> <id_efecto>]"
     permission: effectos.menu
     aliases: [efectos, effects]
+  formato:
+    description: Abre el menú de formatos de texto (bold, underline, italic).
+    usage: "§c¡Uso correcto! › §7/formato"
+    permission: effectos.style
+    aliases: [style, formatos]
 
 permissions:
   effectos.menu:
@@ -25,3 +30,6 @@ permissions:
   effectos.chat.bypass:
     description: Permite bypass el formato de chat personalizado del plugin.
     default: op
+  effectos.style:
+    description: Permite abrir el menú de formatos de texto.
+    default: true

@@ -90,7 +90,8 @@ public class MenuCreator {
         ConfigurationSection config = plugin.getConfig();
         UUID uuid = player.getUniqueId();
         String activeEffect = plugin.getDatabase().getActiveEffect(uuid);
-        String displayCategory = config.getString("main-menu.categories." + categoryId + ".display", categoryId);
+        String displayCategory = config.getString("main-menu.categories." + categoryId + ".display-submenu",
+                config.getString("main-menu.categories." + categoryId + ".display", categoryId));
         Component menuTitle = ColorUtils.toComponent(displayCategory + " &8- Pág. " + (page + 1));
         int size = plugin.getSubMenuSize();
         Inventory inv = Bukkit.createInventory(null, size, menuTitle);
@@ -198,6 +199,32 @@ public class MenuCreator {
         inv.setItem(config.getInt("navigation.back-main.slot", 45),
                 createNavigationItem(config, "navigation.back-main", -1, -1));
         inv.setItem(config.getInt("reset-item.slot", 49), createNavigationItem(config, "reset-item", -1, -1));
+
+        int formatSlot = config.getInt("format-button.slot", 46);
+        String formatMatStr = config.getString("format-button.material", "PAPER");
+        Material formatMat = Material.matchMaterial(formatMatStr);
+        if (formatMat == null) formatMat = Material.PAPER;
+        ItemStack formatItem = new ItemStack(formatMat);
+        ItemMeta formatMeta = formatItem.getItemMeta();
+        if (formatMeta != null) {
+            String formatDisplay = config.getString("format-button.display", "&b✦ ғᴏʀᴍᴀᴛᴏ ᴅᴇ ᴛᴇxᴛᴏ");
+            formatMeta.displayName(ColorUtils.toComponent(formatDisplay));
+            if (config.contains("format-button.custom-model-data")) {
+                formatMeta.setCustomModelData(config.getInt("format-button.custom-model-data"));
+            }
+            List<String> formatLore = config.getStringList("format-button.lore");
+            List<Component> formatTranslatedLore = new ArrayList<>();
+            for (String line : formatLore) {
+                formatTranslatedLore.add(ColorUtils.toComponent(line));
+            }
+            formatMeta.lore(formatTranslatedLore);
+            NamespacedKey formatKey = new NamespacedKey(plugin, "open_format");
+            formatMeta.getPersistentDataContainer().set(formatKey, PersistentDataType.STRING, categoryId);
+            formatItem.setItemMeta(formatMeta);
+        }
+        if (formatSlot >= 0 && formatSlot < size) {
+            inv.setItem(formatSlot, formatItem);
+        }
         if (page > 0) {
             inv.setItem(config.getInt("navigation.previous-page.slot", 48),
                     createNavigationItem(config, "navigation.previous-page", -1, page));
@@ -206,6 +233,69 @@ public class MenuCreator {
         if (end < effects.size()) {
             inv.setItem(config.getInt("navigation.next-page.slot", 50),
                     createNavigationItem(config, "navigation.next-page", page + 2, -1));
+        }
+
+        player.openInventory(inv);
+    }
+
+    @SuppressWarnings("null")
+    public static void openFormatMenu(Player player, CustomEffects plugin, String effectId, String categoryId) {
+        ConfigurationSection config = plugin.getConfig();
+        String title = config.getString("format-menu.title", "&8&lFORMATOS &7- &fEstilo de Texto");
+        int size = config.getInt("format-menu.size", 27);
+        Component menuTitle = ColorUtils.toComponent(title);
+        Inventory inv = Bukkit.createInventory(null, size, menuTitle);
+
+        String currentStyle = plugin.getDatabase().getStyle(player.getUniqueId());
+        ConfigurationSection items = config.getConfigurationSection("format-menu.items");
+
+        if (items != null) {
+            for (String key : items.getKeys(false)) {
+                String path = "format-menu.items." + key + ".";
+                String materialStr = config.getString(path + "material", "PAPER");
+                if (materialStr == null) materialStr = "PAPER";
+                Material mat = Material.matchMaterial(materialStr);
+                if (mat == null) mat = Material.PAPER;
+
+                ItemStack item = new ItemStack(mat);
+                ItemMeta meta = item.getItemMeta();
+                if (meta != null) {
+                    String display = config.getString(path + "display", key);
+                    String style = config.getString(path + "style", "");
+                    boolean isActive = (style != null && style.equals(currentStyle))
+                            || (style.isEmpty() && (currentStyle == null || currentStyle.isEmpty()));
+
+                    String activeIndicator = isActive ? " &a✔" : "";
+                    meta.displayName(ColorUtils.toComponent((display != null ? display : key) + activeIndicator));
+
+                    if (config.contains(path + "custom-model-data")) {
+                        meta.setCustomModelData(config.getInt(path + "custom-model-data"));
+                    }
+
+                    List<String> lore = config.getStringList(path + "lore");
+                    List<Component> translatedLore = new ArrayList<>();
+                    for (String line : lore) {
+                        translatedLore.add(ColorUtils.toComponent(line));
+                    }
+                    meta.lore(translatedLore);
+
+                    NamespacedKey styleKey = new NamespacedKey(plugin, "format_style");
+                    meta.getPersistentDataContainer().set(styleKey, PersistentDataType.STRING, style != null ? style : "");
+
+                    NamespacedKey effectKey = new NamespacedKey(plugin, "pending_effect");
+                    meta.getPersistentDataContainer().set(effectKey, PersistentDataType.STRING, effectId != null ? effectId : "");
+
+                    NamespacedKey categoryKey = new NamespacedKey(plugin, "pending_category");
+                    meta.getPersistentDataContainer().set(categoryKey, PersistentDataType.STRING, categoryId != null ? categoryId : "");
+
+                    item.setItemMeta(meta);
+                }
+
+                int slot = config.getInt(path + "slot", 0);
+                if (slot >= 0 && slot < size) {
+                    inv.setItem(slot, item);
+                }
+            }
         }
 
         player.openInventory(inv);

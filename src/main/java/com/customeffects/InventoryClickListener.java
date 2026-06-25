@@ -60,26 +60,29 @@ public class InventoryClickListener implements Listener {
             String mainTitle = this.plugin.getMainMenuTitle();
             boolean isMainMenu = title.equals(mainTitle);
             boolean isSubMenu = title.contains("Pág.");
-            
-            if (isMainMenu || isSubMenu) {
+            boolean isFormatMenu = title.contains("FORMATOS");
+
+            if (isMainMenu || isSubMenu || isFormatMenu) {
                 HumanEntity whoClicked = event.getWhoClicked();
 
                 event.setCancelled(true);
-                
+
                 if (whoClicked instanceof Player) {
                     Player player = (Player) whoClicked;
                     ItemStack item = event.getCurrentItem();
-                    
+
                     if (item != null && item.getType() != Material.AIR && item.hasItemMeta()) {
                         if (isMainMenu) {
                             NamespacedKey key = new NamespacedKey(this.plugin, "category_id");
                             String categoryId = item.getItemMeta().getPersistentDataContainer().get(key, PersistentDataType.STRING);
-                            
+
                             if (categoryId != null) {
                                 this.playSound(player, "sounds.click", Sound.UI_BUTTON_CLICK, 1.0F, 1.0F);
                                 final String finalCategoryId = categoryId;
                                 Bukkit.getScheduler().runTask(this.plugin, () -> MenuCreator.openCategoryMenu(player, this.plugin, finalCategoryId, 0));
                             }
+                        } else if (isFormatMenu) {
+                            this.handleFormatMenuClick(player, item);
                         } else if (isSubMenu) {
                             this.handleSubMenuClick(player, title, event.getSlot(), item);
                         }
@@ -87,6 +90,68 @@ public class InventoryClickListener implements Listener {
                 }
             }
         }
+    }
+
+    private void handleFormatMenuClick(Player player, ItemStack clickedItem) {
+        NamespacedKey styleKey = new NamespacedKey(this.plugin, "format_style");
+        String style = clickedItem.getItemMeta().getPersistentDataContainer().get(styleKey, PersistentDataType.STRING);
+        if (style == null) return;
+
+        NamespacedKey effectKey = new NamespacedKey(this.plugin, "pending_effect");
+        String pendingEffect = clickedItem.getItemMeta().getPersistentDataContainer().get(effectKey, PersistentDataType.STRING);
+
+        NamespacedKey categoryKey = new NamespacedKey(this.plugin, "pending_category");
+        String pendingCategory = clickedItem.getItemMeta().getPersistentDataContainer().get(categoryKey, PersistentDataType.STRING);
+
+        UUID uuid = player.getUniqueId();
+        ConfigurationSection config = this.plugin.getConfig();
+
+        Bukkit.getScheduler().runTaskAsynchronously(this.plugin, () -> {
+            this.plugin.getDatabase().saveStyle(uuid, style);
+
+            if (pendingEffect != null && !pendingEffect.isEmpty()) {
+                YamlConfiguration categoryConfig = this.plugin.getCategoryConfig(pendingCategory);
+                String hex = "#FFFFFF";
+                if (categoryConfig != null) {
+                    hex = categoryConfig.getString(pendingEffect + ".hex", "#FFFFFF");
+                }
+                this.plugin.getDatabase().saveEffect(uuid, pendingEffect, hex);
+            }
+
+            Bukkit.getScheduler().runTask(this.plugin, () -> {
+                if (pendingEffect != null && !pendingEffect.isEmpty()) {
+                    String effectDisplay = this.plugin.getEffectDisplay(pendingEffect, pendingCategory);
+                    String successMsg = config.getString("messages.equip-success", "%effectos_prefix%&a¡Efecto &f{effect} &aequipado con éxito!")
+                            .replace("{effect}", effectDisplay);
+                    player.sendMessage(ColorUtils.translate(resolvePrefix(successMsg)));
+                    this.playSound(player, "sounds.equip", Sound.ENTITY_PLAYER_LEVELUP, 0.8F, 1.2F);
+                } else {
+                    if (style.isEmpty()) {
+                        String msg = config.getString("format-menu.messages.style-reset", "%effectos_prefix%&cFormato eliminado.");
+                        player.sendMessage(ColorUtils.translate(resolvePrefix(msg)));
+                    } else {
+                        String msg = config.getString("format-menu.messages.style-set", "%effectos_prefix%&aFormato cambiado a: &f{style}");
+                        String displayStyle = getStyleDisplayName(style);
+                        player.sendMessage(ColorUtils.translate(resolvePrefix(msg).replace("{style}", displayStyle)));
+                    }
+                    this.playSound(player, "format-menu.sounds.select", Sound.UI_BUTTON_CLICK, 1.0F, 1.0F);
+                }
+                player.closeInventory();
+            });
+        });
+    }
+
+    private String getStyleDisplayName(String style) {
+        return switch (style) {
+            case "bold" -> "Bold (Negrita)";
+            case "underline" -> "Underline (Subrayado)";
+            case "italic" -> "Italic (Cursiva)";
+            case "bold_underline" -> "Bold + Underline";
+            case "bold_italic" -> "Bold + Italic";
+            case "underline_italic" -> "Underline + Italic";
+            case "bold_underline_italic" -> "Bold + Underline + Italic";
+            default -> "Sin Formato";
+        };
     }
 
     private void handleSubMenuClick(Player player, String title, int slot, ItemStack clickedItem) {
@@ -127,9 +192,13 @@ public class InventoryClickListener implements Listener {
             final int finalPage = page;
 
             int backSlot = config.getInt("navigation.back-main.slot", 45);
+            int formatSlot = config.getInt("format-button.slot", 46);
             if (slot == backSlot) {
                 this.playSound(player, "sounds.back", Sound.BLOCK_WOODEN_TRAPDOOR_CLOSE, 1.0F, 1.0F);
                 Bukkit.getScheduler().runTask(this.plugin, () -> MenuCreator.openMainMenu(player, this.plugin));
+            } else if (slot == formatSlot) {
+                this.playSound(player, "sounds.click", Sound.UI_BUTTON_CLICK, 1.0F, 1.0F);
+                Bukkit.getScheduler().runTask(this.plugin, () -> MenuCreator.openFormatMenu(player, this.plugin, null, finalCategoryId));
             } else {
                 int resetSlot = config.getInt("reset-item.slot", 49);
                 if (slot == resetSlot) {
@@ -184,21 +253,8 @@ public class InventoryClickListener implements Listener {
                                     return;
                                 }
 
-                                String hex = categoryConfig.getString(effectId + ".hex", "#FFFFFF");
-                                final String finalEffectId = effectId;
-                                final String finalHex = hex;
-                                
-                                Bukkit.getScheduler().runTaskAsynchronously(this.plugin, () -> {
-                                    this.plugin.getDatabase().saveEffect(uuid, finalEffectId, finalHex);
-                                    Bukkit.getScheduler().runTask(this.plugin, () -> {
-                                        String effectDisplay = this.plugin.getEffectDisplay(finalEffectId, finalCategoryId);
-                                        String successMsg = config.getString("messages.equip-success", "%effectos_prefix%&a¡Efecto &f{effect} &aequipado con éxito!")
-                                                .replace("{effect}", effectDisplay);
-                                        player.sendMessage(ColorUtils.translate(resolvePrefix(successMsg)));
-                                        this.playSound(player, "sounds.equip", Sound.ENTITY_PLAYER_LEVELUP, 0.8F, 1.2F);
-                                        MenuCreator.openCategoryMenu(player, this.plugin, finalCategoryId, finalPage);
-                                    });
-                                });
+                                this.playSound(player, "sounds.click", Sound.UI_BUTTON_CLICK, 1.0F, 1.0F);
+                                Bukkit.getScheduler().runTask(this.plugin, () -> MenuCreator.openFormatMenu(player, this.plugin, effectId, finalCategoryId));
                             }
                         }
                     }

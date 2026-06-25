@@ -1,7 +1,7 @@
 package com.customeffects.placeholder;
 
-import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.configuration.file.YamlConfiguration;
+import java.util.UUID;
+
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -19,20 +19,17 @@ public class EffectosExpansion extends PlaceholderExpansion {
 
     @Override
     public @NotNull String getIdentifier() {
-        return "effectos";
+        return "ampleffects";
     }
 
     @Override
     public @NotNull String getAuthor() {
-        var meta = this.plugin.getPluginMeta();
-        return meta.getAuthors().isEmpty()
-                ? "09X18"
-                : meta.getAuthors().get(0);
+        return "09X18";
     }
 
     @Override
     public @NotNull String getVersion() {
-        return this.plugin.getPluginMeta().getVersion();
+        return "2.0.0";
     }
 
     @Override
@@ -41,102 +38,83 @@ public class EffectosExpansion extends PlaceholderExpansion {
     }
 
     @Override
-    public String onPlaceholderRequest(Player player, @NotNull String identifier) {
-        if (player == null) {
-            return "";
+    public String onPlaceholderRequest(Player player, @NotNull String params) {
+        if (player == null) return "";
+
+        UUID uuid = player.getUniqueId();
+        if (this.plugin.getDatabase().getActiveEffect(uuid) == null) {
+            this.plugin.getDatabase().loadPlayerData(uuid);
         }
 
-        String effectId = this.plugin.getDatabase().getActiveEffect(player.getUniqueId());
-        String hex = this.plugin.getDatabase().getHex(player.getUniqueId());
+        String effectId = this.plugin.getDatabase().getActiveEffect(uuid);
+        String hex = this.plugin.getDatabase().getHex(uuid);
+        String style = this.plugin.getDatabase().getStyle(uuid);
 
-        if (identifier.equalsIgnoreCase("hex")) {
-            return hex != null && !hex.isEmpty() ? hex : "#FFFFFF";
-        } else if (identifier.equalsIgnoreCase("effect")) {
-            return effectId != null && !effectId.isEmpty() ? effectId : "NONE";
-        } else if (identifier.equalsIgnoreCase("has_effect")) {
-            return effectId != null && !effectId.isEmpty() ? "true" : "false";
-        } else if (identifier.equalsIgnoreCase("format")) {
-            return hex != null && !hex.isEmpty() ? ColorUtils.translate(hex + player.getName())
-                    : ColorUtils.translate("&f" + player.getName());
-        } else if (identifier.equalsIgnoreCase("minimessage")) {
-            if (hex != null && !hex.isEmpty()) {
-                String cleanHex = hex.replace("§", "").replace("#", "").replace("&", "");
-                return "<#" + cleanHex + ">" + player.getName();
-            } else {
-                return "<white>" + player.getName();
-            }
-        } else if (identifier.equalsIgnoreCase("decorated_name")) {
-            return hex != null && !hex.isEmpty() ? ColorUtils.translate(hex + player.getName() + "&r")
-                    : player.getName();
-        } else if (identifier.equalsIgnoreCase("luckperms_prefix")) {
-            String luckPrefix = me.clip.placeholderapi.PlaceholderAPI
-                    .setPlaceholders(player, "%luckperms_prefix%");
-            if (luckPrefix.isEmpty()) {
-                return "";
-            }
-            if (hex != null && !hex.isEmpty()) {
-                String cleanPrefix = stripAllFormatting(luckPrefix);
-                return ColorUtils.translate(hex + cleanPrefix + "&r");
-            }
-            return luckPrefix;
-        } else if (identifier.equalsIgnoreCase("name")) {
-            return getEffectName(effectId);
-        } else if (identifier.equalsIgnoreCase("preview")) {
-            return getEffectPreview(effectId);
-        } else if (identifier.equalsIgnoreCase("status")) {
-            return effectId != null && !effectId.isEmpty() ? "EQUIPPED" : "NONE";
-        } else if (identifier.equalsIgnoreCase("hex_minimessage")) {
-            if (hex != null && !hex.isEmpty()) {
-                return ColorUtils.hexToMiniMessage(hex);
-            } else {
+        switch (params.toLowerCase()) {
+            case "hex":
+                return hex != null && !hex.isEmpty() ? hex : "#FFFFFF";
+            case "effect":
+                return effectId != null && !effectId.isEmpty() ? effectId : "NONE";
+            case "has_effect":
+                return effectId != null && !effectId.isEmpty() ? "true" : "false";
+            case "format":
+                String s1 = ColorUtils.styleToLegacy(style != null ? style : "");
+                return hex != null && !hex.isEmpty()
+                        ? ColorUtils.translate(hex + s1 + player.getName())
+                        : ColorUtils.translate("&f" + s1 + player.getName());
+            case "styled":
+                return ColorUtils.styleToLegacy(style != null ? style : "");
+            case "minimessage":
+            case "styled_minimessage":
+                if (hex != null && !hex.isEmpty()) {
+                    String cleanHex = hex.replace("§", "").replace("#", "").replace("&", "");
+                    return ColorUtils.applyStyle("<#" + cleanHex + ">" + player.getName(), style != null ? style : "");
+                }
+                return ColorUtils.applyStyle("<white>" + player.getName(), style != null ? style : "");
+            case "style":
+                if (style == null || style.isEmpty()) return "Sin Formato";
+                return switch (style) {
+                    case "bold" -> "Bold";
+                    case "underline" -> "Underline";
+                    case "italic" -> "Italic";
+                    case "bold_underline" -> "Bold+Underline";
+                    case "bold_italic" -> "Bold+Italic";
+                    case "underline_italic" -> "Underline+Italic";
+                    case "bold_underline_italic" -> "Bold+Underline+Italic";
+                    default -> style;
+                };
+            case "style_code":
+                return ColorUtils.styleToLegacy(style != null ? style : "");
+            case "name":
+                if (effectId == null || effectId.isEmpty()) return "Ninguno";
+                return ColorUtils.translate(this.plugin.getEffectDisplay(effectId));
+            case "preview":
+                return getEffectPreview(effectId);
+            case "status":
+                return effectId != null && !effectId.isEmpty() ? "EQUIPPED" : "NONE";
+            case "hex_minimessage":
+                if (hex != null && !hex.isEmpty()) {
+                    return ColorUtils.hexToMiniMessage(hex);
+                }
                 return "<white>";
-            }
-        } else if (identifier.equalsIgnoreCase("effect_category")) {
-            return this.getEffectCategory(effectId);
-        } else if (identifier.equalsIgnoreCase("permission_node")) {
-            return this.getEffectPermission(effectId);
-        } else if (identifier.equalsIgnoreCase("has_permission")) {
-            if (effectId != null && !effectId.isEmpty()) {
-                String perm = this.getEffectPermission(effectId);
-                if (perm != null && !perm.isEmpty()) {
-                    return String.valueOf(player.hasPermission(perm));
-                }
-            }
-            return "false";
-        } else if (identifier.startsWith("other_")) {
-            String[] parts = identifier.split("_", 3);
-            if (parts.length >= 3) {
-                String targetPlayerName = parts[1];
-                String subIdentifier = parts[2];
-                Player targetPlayer = this.plugin.getServer().getPlayerExact(targetPlayerName);
-                if (targetPlayer != null) {
-                    return this.onPlaceholderRequest(targetPlayer, subIdentifier);
-                }
-            }
+            case "decorated_name":
+                String s2 = ColorUtils.styleToLegacy(style != null ? style : "");
+                return hex != null && !hex.isEmpty()
+                        ? ColorUtils.translate(hex + s2 + player.getName() + "&r")
+                        : player.getName();
+            default:
+                return null;
         }
-
-        return null;
-    }
-
-    private String getEffectName(String effectId) {
-        if (effectId == null || effectId.isEmpty()) {
-            String msg = this.plugin.getConfig().getString("messages.no-effect-name", "&cNinguno");
-            return ColorUtils.translate(msg != null ? msg : "&cNinguno");
-        }
-        return ColorUtils.translate(this.plugin.getEffectDisplay(effectId));
     }
 
     private String getEffectPreview(String effectId) {
         if (effectId == null || effectId.isEmpty()) {
-            String msg = this.plugin.getConfig().getString("messages.no-effect-preview", "&cSin Efecto");
-            return ColorUtils.translate(msg != null ? msg : "&cSin Efecto");
+            return "Sin Efecto";
         }
-
-        ConfigurationSection categoriesSection = this.plugin.getConfig()
-                .getConfigurationSection("main-menu.categories");
+        var categoriesSection = this.plugin.getConfig().getConfigurationSection("main-menu.categories");
         if (categoriesSection != null) {
             for (String category : categoriesSection.getKeys(false)) {
-                YamlConfiguration categoryConfig = this.plugin.getCategoryConfig(category);
+                var categoryConfig = this.plugin.getCategoryConfig(category);
                 if (categoryConfig != null && categoryConfig.contains(effectId)) {
                     String preview = categoryConfig.getString(effectId + ".preview", effectId);
                     return ColorUtils.translate(preview != null ? preview : effectId);
@@ -144,55 +122,5 @@ public class EffectosExpansion extends PlaceholderExpansion {
             }
         }
         return effectId;
-    }
-
-    private String getEffectCategory(String effectId) {
-        if (effectId == null || effectId.isEmpty()) {
-            return "NONE";
-        }
-
-        ConfigurationSection categoriesSection = this.plugin.getConfig()
-                .getConfigurationSection("main-menu.categories");
-        if (categoriesSection != null) {
-            for (String category : categoriesSection.getKeys(false)) {
-                YamlConfiguration categoryConfig = this.plugin.getCategoryConfig(category);
-                if (categoryConfig != null && categoryConfig.contains(effectId)) {
-                    return category;
-                }
-            }
-        }
-        return "UNKNOWN";
-    }
-
-    private String getEffectPermission(String effectId) {
-        if (effectId == null || effectId.isEmpty()) {
-            return "";
-        }
-
-        ConfigurationSection categoriesSection = this.plugin.getConfig()
-                .getConfigurationSection("main-menu.categories");
-        if (categoriesSection != null) {
-            for (String category : categoriesSection.getKeys(false)) {
-                YamlConfiguration categoryConfig = this.plugin.getCategoryConfig(category);
-                if (categoryConfig != null && categoryConfig.contains(effectId)) {
-                    return categoryConfig.getString(effectId + ".permission", "");
-                }
-            }
-        }
-        return "";
-    }
-
-    private String stripAllFormatting(String text) {
-        if (text == null)
-            return "";
-        text = text.replaceAll("<gradient:#[A-Fa-f0-9]{6}:(#[A-Fa-f0-9]{6})(?::(#[A-Fa-f0-9]{6}))?>", "");
-        text = text.replaceAll("</gradient>", "");
-        text = text.replaceAll("<gradient:[^>]*>", "");
-        text = text.replaceAll("#[A-Fa-f0-9]{6}", "");
-        text = text.replaceAll("&#([A-Fa-f0-9]{6})", "");
-        text = text.replaceAll("§[0-9a-fk-orA-FK-OR]", "");
-        text = text.replaceAll("&[0-9a-fk-orA-FK-OR]", "");
-        text = text.replaceAll("§x(§[0-9a-fA-F]){6}", "");
-        return text;
     }
 }

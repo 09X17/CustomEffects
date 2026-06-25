@@ -48,10 +48,12 @@ public class PlaceholderResolver {
         UUID uuid = player.getUniqueId();
         String effectId = plugin.getDatabase().getActiveEffect(uuid);
         String hex = plugin.getDatabase().getHex(uuid);
+        String style = plugin.getDatabase().getStyle(uuid);
 
         String effectName = getEffectName(effectId);
         String effectPreview = getEffectPreview(effectId);
         String effectStatus = effectId != null && !effectId.isEmpty() ? "EQUIPPED" : "NONE";
+        String styleName = getStyleName(style);
 
         String result = text;
         result = result.replace("{effect_id}", effectId != null && !effectId.isEmpty() ? effectId : "NONE");
@@ -59,6 +61,8 @@ public class PlaceholderResolver {
         result = result.replace("{effect_preview}", effectPreview);
         result = result.replace("{effect_hex}", hex != null && !hex.isEmpty() ? hex : "#FFFFFF");
         result = result.replace("{effect_status}", effectStatus);
+        result = result.replace("{style}", styleName);
+        result = result.replace("{style_code}", ColorUtils.styleToLegacy(style != null ? style : ""));
 
         return result;
     }
@@ -145,6 +149,20 @@ public class PlaceholderResolver {
             }
         }
         return effectId;
+    }
+
+    private String getStyleName(String style) {
+        if (style == null || style.isEmpty()) return "Sin Formato";
+        return switch (style) {
+            case "bold" -> "Bold";
+            case "underline" -> "Underline";
+            case "italic" -> "Italic";
+            case "bold_underline" -> "Bold+Underline";
+            case "bold_italic" -> "Bold+Italic";
+            case "underline_italic" -> "Underline+Italic";
+            case "bold_underline_italic" -> "Bold+Underline+Italic";
+            default -> style;
+        };
     }
 
     public boolean hasPerEffectFormat(String effectId) {

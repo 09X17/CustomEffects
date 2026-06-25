@@ -65,22 +65,22 @@ public class EffectosCommand implements CommandExecutor, TabCompleter {
 
     private boolean handleReload(CommandSender sender) {
         if (!sender.hasPermission("effectos.reload")) {
-            sender.sendMessage(resolveMessage("messages.reload-no-permission",
-                    "%effectos_prefix%&cNo tienes permiso para recargar la configuración."));
+            sender.sendMessage(ColorUtils.translate(resolveMessage("messages.reload-no-permission",
+                    "%effectos_prefix%&cNo tienes permiso para recargar la configuración.")));
             return true;
         }
 
         this.plugin.reloadConfig();
         this.plugin.loadEffects();
-        sender.sendMessage(resolveMessage("messages.reload-success",
-                "%effectos_prefix%&aConfiguración y efectos recargados con éxito."));
+        sender.sendMessage(ColorUtils.translate(resolveMessage("messages.reload-success",
+                "%effectos_prefix%&aConfiguración y efectos recargados con éxito.")));
         return true;
     }
 
     private boolean handleGiveVoucher(CommandSender sender, String label, String[] args) {
         if (!sender.hasPermission("effectos.admin")) {
-            sender.sendMessage(resolveMessage("messages.voucher-no-permission",
-                    "%effectos_prefix%&cNo tienes permiso para dar vouchers."));
+            sender.sendMessage(ColorUtils.translate(resolveMessage("messages.voucher-no-permission",
+                    "%effectos_prefix%&cNo tienes permiso para dar vouchers.")));
             return true;
         }
 
@@ -100,12 +100,13 @@ public class EffectosCommand implements CommandExecutor, TabCompleter {
         }
 
         String effectId = args[2];
+        String effectDisplay = this.plugin.getEffectDisplay(effectId);
         ItemStack voucher = createVoucher(effectId);
 
         if (voucher == null) {
             String msg = resolveMessage("messages.voucher-not-found",
                     "%effectos_prefix%&cNo se encontró ningún voucher configurado para el efecto: &e{effect}");
-            sender.sendMessage(ColorUtils.translate(msg.replace("{effect}", effectId)));
+            sender.sendMessage(ColorUtils.translate(msg.replace("{effect}", effectDisplay)));
             return true;
         }
 
@@ -117,13 +118,13 @@ public class EffectosCommand implements CommandExecutor, TabCompleter {
 
         String senderMsg = resolveMessage("messages.voucher-given-sender",
                 "%effectos_prefix%&aHas entregado 1x Voucher de &e{effect} &aa &f{player}&a.")
-                .replace("{effect}", effectId)
+                .replace("{effect}", effectDisplay)
                 .replace("{player}", target.getName());
         sender.sendMessage(ColorUtils.translate(senderMsg));
 
         String targetMsg = resolveMessage("messages.voucher-given-target",
                 "%effectos_prefix%&a¡Has recibido un voucher para el efecto: &e{effect}&a!")
-                .replace("{effect}", effectId);
+                .replace("{effect}", effectDisplay);
         target.sendMessage(ColorUtils.translate(targetMsg));
 
         return true;
@@ -212,7 +213,7 @@ public class EffectosCommand implements CommandExecutor, TabCompleter {
     private String resolveMessage(String path, String defaultValue) {
         String raw = this.plugin.getConfig().getString(path, defaultValue);
         String prefix = this.plugin.getConfig().getString("prefix", "");
-        return ColorUtils.translate(raw.replace("%effectos_prefix%", prefix));
+        return raw.replace("%effectos_prefix%", prefix);
     }
 
     @Override
