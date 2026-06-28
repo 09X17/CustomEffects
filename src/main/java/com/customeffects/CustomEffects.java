@@ -30,8 +30,12 @@ public final class CustomEffects extends JavaPlugin {
     private String mainMenuTitle;
     private int mainMenuSize;
     private int subMenuSize;
+    private int effectsPerPage;
     private final Map<String, List<String>> categoryEffects = new HashMap<>();
     private final Map<String, Map<String, Map<String, String>>> effectData = new HashMap<>();
+    private final Map<String, List<String>> categorySubcategories = new HashMap<>();
+    private final Map<String, Map<String, Map<String, String>>> subcategoryData = new HashMap<>();
+    private final Map<String, Map<String, List<String>>> subcategoryEffects = new HashMap<>();
 
     public CustomEffects() {
     }
@@ -183,10 +187,14 @@ public final class CustomEffects extends JavaPlugin {
     public void loadPluginData() {
         this.categoryEffects.clear();
         this.effectData.clear();
+        this.categorySubcategories.clear();
+        this.subcategoryData.clear();
+        this.subcategoryEffects.clear();
 
         this.mainMenuTitle = ColorUtils.translate(cfg("main-menu.title", "&8Categorías de Efectos"));
         this.mainMenuSize = this.getConfig().getInt("main-menu.size", 27);
         this.subMenuSize = this.getConfig().getInt("subcategory-menu.size", 54);
+        this.effectsPerPage = this.getConfig().getInt("subcategory-menu.effects-per-page", 45);
 
         ConfigurationSection categoriesSection = this.getConfig().getConfigurationSection("main-menu.categories");
         if (categoriesSection == null) {
@@ -195,6 +203,7 @@ public final class CustomEffects extends JavaPlugin {
         }
 
         int totalEfectos = 0;
+        int totalSubcategorias = 0;
         File categoriesFolder = new File(this.getDataFolder(), "categories");
 
         for (String categoryKey : categoriesSection.getKeys(false)) {
@@ -209,11 +218,36 @@ public final class CustomEffects extends JavaPlugin {
             List<String> effectIDs = new ArrayList<>();
             Map<String, Map<String, String>> categoryEffectMap = new HashMap<>();
 
+            // Parse subcategories section if present
+            ConfigurationSection subcatsSection = categoryConfig.getConfigurationSection("subcategories");
+            List<String> subcategoryKeys = new ArrayList<>();
+            Map<String, Map<String, String>> subcatDataMap = new HashMap<>();
+            Map<String, List<String>> subcatEffectsMap = new HashMap<>();
+
+            if (subcatsSection != null) {
+                for (String subcatKey : subcatsSection.getKeys(false)) {
+                    if (!subcatsSection.isConfigurationSection(subcatKey)) continue;
+                    if (!subcatsSection.getBoolean(subcatKey + ".enable", true)) continue;
+
+                    subcategoryKeys.add(subcatKey);
+                    totalSubcategorias++;
+
+                    Map<String, String> subcatInfo = new HashMap<>();
+                    subcatInfo.put("display",          cfgSection(subcatsSection, subcatKey + ".display", subcatKey));
+                    subcatInfo.put("material",          cfgSection(subcatsSection, subcatKey + ".material", "PAPER"));
+                    subcatInfo.put("custom-model-data", cfgSection(subcatsSection, subcatKey + ".custom-model-data", ""));
+                    subcatInfo.put("slot",              cfgSection(subcatsSection, subcatKey + ".slot", ""));
+                    subcatInfo.put("skull-value",       cfgSection(subcatsSection, subcatKey + ".skull-value", ""));
+                    subcatDataMap.put(subcatKey, subcatInfo);
+                    subcatEffectsMap.put(subcatKey, new ArrayList<>());
+                }
+            }
+
+            // Parse effects
             for (String effectKey : categoryConfig.getKeys(false)) {
+                if (effectKey.equals("subcategories")) continue;
                 if (!categoryConfig.isConfigurationSection(effectKey)) continue;
                 if (!categoryConfig.getBoolean(effectKey + ".enable", true)) continue;
-
-                effectIDs.add(effectKey);
 
                 Map<String, String> effectInfo = new HashMap<>();
                 effectInfo.put("display",          cfgSection(categoryConfig, effectKey + ".display", effectKey));
@@ -226,18 +260,28 @@ public final class CustomEffects extends JavaPlugin {
                 effectInfo.put("skull-value",       cfgSection(categoryConfig, effectKey + ".skull-value", ""));
                 effectInfo.put("has-custom-lore",   categoryConfig.contains(effectKey + ".lore") ? "true" : "false");
 
+                String subcategory = categoryConfig.getString(effectKey + ".subcategory", "");
+                if (subcategory != null && !subcategory.isEmpty() && subcatEffectsMap.containsKey(subcategory)) {
+                    subcatEffectsMap.get(subcategory).add(effectKey);
+                } else {
+                    effectIDs.add(effectKey);
+                }
+
                 categoryEffectMap.put(effectKey, effectInfo);
                 ++totalEfectos;
             }
 
             this.categoryEffects.put(categoryKey, effectIDs);
             this.effectData.put(categoryKey, categoryEffectMap);
+            this.categorySubcategories.put(categoryKey, subcategoryKeys);
+            this.subcategoryData.put(categoryKey, subcatDataMap);
+            this.subcategoryEffects.put(categoryKey, subcatEffectsMap);
         }
 
         Logger logger = this.getLogger();
         logger.log(Level.INFO,
-                "Se han indexado {0} categorías con un total de {1} efectos.",
-                new Object[]{ this.categoryEffects.size(), totalEfectos });
+                "Se han indexado {0} categorías, {2} subcategorías y un total de {1} efectos.",
+                new Object[]{ this.categoryEffects.size(), totalEfectos, totalSubcategorias });
     }
 
     private void saveCategoryFiles() {
@@ -286,6 +330,29 @@ public final class CustomEffects extends JavaPlugin {
 
     public int getSubMenuSize() {
         return this.subMenuSize;
+    }
+
+    public int getEffectsPerPage() {
+        return this.effectsPerPage;
+    }
+
+    public boolean hasSubcategories(String category) {
+        List<String> subcats = this.categorySubcategories.getOrDefault(category, new ArrayList<>());
+        return !subcats.isEmpty();
+    }
+
+    public List<String> getSubcategories(String category) {
+        return this.categorySubcategories.getOrDefault(category, new ArrayList<>());
+    }
+
+    public Map<String, String> getSubcategoryInfo(String category, String subcategory) {
+        return this.subcategoryData.getOrDefault(category, new HashMap<>())
+                .getOrDefault(subcategory, new HashMap<>());
+    }
+
+    public List<String> getEffectsBySubcategory(String category, String subcategory) {
+        return this.subcategoryEffects.getOrDefault(category, new HashMap<>())
+                .getOrDefault(subcategory, new ArrayList<>());
     }
 
     public String getEffectDisplay(String effectId) {

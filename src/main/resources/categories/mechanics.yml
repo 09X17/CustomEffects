@@ -173,3 +173,135 @@ ruido:
   permission: "effectos.noise"
   preview: "#F8F8C4Ruido"
 
+agua:
+  enable: true
+  slot: 19
+  material: PLAYER_HEAD
+  custom-model-data: 90000
+  skull-value: 'eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvODA0ZDkyMTg0ZjJmZGQxMTJiNTVkNTliOTgwMDEzMmJiZDA2NTI1OGQ2NTg5M2UxNzA4OWNlNzhkNzY0YTkzZSJ9fX0='
+  display: "#F8F8D4&lOLAS"
+  hex: "#F8F8D4"
+  permission: "effectos.water"
+  preview: "#F8F8D4¡Hola Mundo!"
+
+agua_personalizada:
+  enable: true
+  slot: 28
+  material: PLAYER_HEAD
+  custom-model-data: 90000
+  skull-value: 'eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvODA0ZDkyMTg0ZjJmZGQxMTJiNTVkNTliOTgwMDEzMmJiZDA2NTI1OGQ2NTg5M2UxNzA4OWNlNzhkNzY0YTkzZSJ9fX0='
+  display: "#F8F8D8&lOLAS 2"
+  hex: "#F8F8D8"
+  permission: "effectos.watercustom"
+  preview: "#F8F8D8¡Hola Mundo!"
+
+liquido:
+  enable: true
+  slot: 37
+  material: PLAYER_HEAD
+  custom-model-data: 90000
+  skull-value: 'eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvODA0ZDkyMTg0ZjJmZGQxMTJiNTVkNTliOTgwMDEzMmJiZDA2NTI1OGQ2NTg5M2UxNzA4OWNlNzhkNzY0YTkzZSJ9fX0='
+  display: "#F8F8C8&lLÍQUIDOS"
+  hex: "#F8F8C8"
+  permission: "effectos.liquid"
+  preview: "#F8F8C8¡Hola Mundo!"
+
+arcoiris_glacial:
+  enable: false
+  material: PLAYER_HEAD
+  custom-model-data: 2050
+  slot: 20
+  skull-value: 'eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMTYzZTQ5ZDcwNDNlNTk0MDJlMDZiNWE5NWUzODVkOTRmYzMwOGY4NjkyNTQ4NWVhMDA1ZjRjYjJmZDI5OGEyMCJ9fX0='
+  display: "#E0FFFF&lGRADIENTE DINÁMICO GLACIAL"
+  hex: "#E0FFFF"
+  permission: "effectos.frostrainbow"
+  preview: "#E0FFFF¡Hola Mundo!"
+
+arcoiris_ondulado:
+  enable: true
+  material: PLAYER_HEAD
+  custom-model-data: 90000
+  slot: 9
+  skull-value: 'eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvY2Y1OTU0NjZhYjg2NTFlMTU5MDYzODI2NDA3ZjY4OWUxNzg4ODYwZjFlNmUxZjQxZjYyNjY3YzhlZDhhMGQ1YSJ9fX0='
+  display: "#F8F898&lGRADIENTE DINÁMICO ONDULADO"
+  hex: "#F8F898"
+  permission: "effectos.wavyrainbow"
+  preview: "#F8F898¡Hola Mundo!"
+
+arcoiris_elastico:
+  enable: true
+  material: PLAYER_HEAD
+  custom-model-data: 90000
+  slot: 18
+  skull-value: 'eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvY2Y1OTU0NjZhYjg2NTFlMTU5MDYzODI2NDA3ZjY4OWUxNzg4ODYwZjFlNmUxZjQxZjYyNjY3YzhlZDhhMGQ1YSJ9fX0='
+  display: "#F8F89C&lGRADIENTE DINÁMICO ELÁSTICO"
+  hex: "#F8F89C"
+  permission: "effectos.bouncyrainbow"
+  preview: "#F8F89C¡Hola Mundo!"
+
+gradiente_dinamico_gyr:
+  enable: true
+  material: PLAYER_HEAD
+  custom-model-data: 90000
+  slot: 31
+  skull-value: 'eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZWJmZWQ1MTZmOGI0ZTVlZjhjNGFjYzEyNTdjZmRjMGY3ZWI2OGMzMjNkMWFhYWU0MjVmOTI5NThhNGY0NTMzZCJ9fX0='
+  display: "#B4C8FF&lGRADIENTE DINÁMICO GYR"
+  hex: "#B4C8FF"
+  permission: "effectos.dynamicgradientgyr"
+  preview: "#B4C8FF¡Hola Mundo!"
+
+gradiente_dinamico_gb:
+  enable: true
+  material: PlAYER_HEAD
+  custom-model-data: 90000
+  slot: 6
+  skull-value: 'eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZWJmZWQ1MTZmOGI0ZTVlZjhjNGFjYzEyNTdjZmRjMGY3ZWI2OGMzMjNkMWFhYWU0MjVmOTI5NThhNGY0NTMzZCJ9fX0='
+  display: "#E0FFFF&lGRADIENTE DINÁMICO GB"
+  hex: "#E0FFFF"
+  permission: "effectos.dynamicgradientgb"
+  preview: "#E0FFFF¡Hola Mundo!"
+
+gradiente_dinamico_br:
+  enable: true
+  material: PlAYER_HEAD
+  custom-model-data: 90000
+  slot: 14
+  skull-value: 'eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZWJmZWQ1MTZmOGI0ZTVlZjhjNGFjYzEyNTdjZmRjMGY3ZWI2OGMzMjNkMWFhYWU0MjVmOTI5NThhNGY0NTMzZCJ9fX0='
+  display: "#C8F0FF&lGRADIENTE DINÁMICO BR"
+  hex: "#C8F0FF"
+  permission: "effectos.dynamicgradientbr"
+  preview: "#C8F0FF¡Hola Mundo!"
+
+gradiente:
+  enable: true
+  material: PLAYER_HEAD
+  slot: 26
+  custom-model-data: 90000
+  skull-value: 'eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMTNjYzg1NDQzYjllMTg3Mzc0NDg1ODEzZTA1ZDBkNTNlNDhmNjVhNTM5MWU1MDM3ODliNTM1NDRlM2I2MzQ1YSJ9fX0='
+  display: "#F8F888&lGRADIENTE"
+  hex: "#F8F888"
+  permission: "effectos.gradient"
+  preview: "#F8F888¡Hola Mundo!"
+
+cromatico:
+  enable: true
+  material: PLAYER_HEAD
+  slot: 31
+  custom-model-data: 90000
+  skull-value: 'eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNTlmZDVjNGJkMTlhY2EzMmU4MTk4N2YyODE3ZTJhNWJjNzJmMDRlYmJiNTIwMDBhYmUwOGE4M2EyMjllYzVmYSJ9fX0='
+  display: "#F8F8BC&lCROMÁTICO"
+  hex: "#F8F8BC"
+  permission: "effectos.chromatic"
+  preview: "#F8F8BC¡Hola Mundo!"
+
+
+tramado:
+  enable: true
+  material: PLAYER_HEAD
+  slot: 43
+  custom-model-data: 90000
+  skull-value: 'eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNGYxMzhmNTZkNzRlNWY1YTlhYzhhYWFjNmYzOTA3MzhkMzU1M2NkNDY1YmQzMjRhYzk4OTIwNDc4N2ViODVjMyJ9fX0='
+  display: "#F8F8B0&lTRAMADO"
+  hex: "#F8F8B0"
+  permission: "effectos.hatch"
+  preview: "#F8F8B0¡Hola Mundo!"

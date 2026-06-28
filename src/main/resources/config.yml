@@ -84,6 +84,7 @@ main-menu:
 
 subcategory-menu:
   size: 54
+  effects-per-page: 45
 
 # ==========================================
 #          BOTONES DE NAVEGACIÓN
@@ -91,19 +92,24 @@ subcategory-menu:
 
 navigation:
   next-page:
+    enable: true
+    slot: 50
     material: PAPER
     custom-model-data: 1201
     display: "&asɪɢᴜɪᴇɴᴛᴇ ᴘáɢɪɴᴀ"
     lore:
       - "&r "
   previous-page:
+    enable: true
+    slot: 48
     material: PAPER
     custom-model-data: 1202
     display: "&cᴘáɢɪɴᴀ ᴀɴᴛᴇʀɪᴏʀ"
     lore:
       - "&r "
   back-main:
-    slot: 48
+    enable: true
+    slot: 45
     material: PAPER
     custom-model-data: 1202
     display: "&cᴠᴏʟᴠᴇʀ ᴀʟ ᴍᴇɴú ᴘʀɪɴᴄɪᴘᴀʟ"
@@ -111,6 +117,7 @@ navigation:
       - "&r "
 
 format-button:
+  enable: false
   slot: 46
   material: PAPER
   custom-model-data: 1203
@@ -123,6 +130,7 @@ format-button:
     - " &e✦ Click para abrir"
 
 reset-item:
+  enable: true
   slot: 49
   material: PAPER
   custom-model-data: 1190

@@ -2,6 +2,7 @@ package com.customeffects;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -87,150 +88,234 @@ public class MenuCreator {
     }
 
     public static void openCategoryMenu(Player player, CustomEffects plugin, String categoryId, int page) {
+        if (plugin.hasSubcategories(categoryId)) {
+            openSubcategoryMenu(player, plugin, categoryId);
+            return;
+        }
+        openCategoryEffectsMenu(player, plugin, categoryId, null, page);
+    }
+
+    public static void openCategoryMenu(Player player, CustomEffects plugin, String categoryId, String subcategoryId, int page) {
+        openCategoryEffectsMenu(player, plugin, categoryId, subcategoryId, page);
+    }
+
+    private static void openSubcategoryMenu(Player player, CustomEffects plugin, String categoryId) {
         ConfigurationSection config = plugin.getConfig();
-        UUID uuid = player.getUniqueId();
-        String activeEffect = plugin.getDatabase().getActiveEffect(uuid);
         String displayCategory = config.getString("main-menu.categories." + categoryId + ".display-submenu",
                 config.getString("main-menu.categories." + categoryId + ".display", categoryId));
-        Component menuTitle = ColorUtils.toComponent(displayCategory + " &8- Pág. " + (page + 1));
+        Component menuTitle = ColorUtils.toComponent(displayCategory + " &8- Subcategorías");
+
         int size = plugin.getSubMenuSize();
         Inventory inv = Bukkit.createInventory(null, size, menuTitle);
-        List<String> effects = plugin.getEffectsByCategory(categoryId);
-        int start = page * 45;
-        int end = Math.min(start + 45, effects.size());
-        String equippedMsg = config.getString("messages.equipped", "&e&n✦ ᴇǫᴜɪᴘᴀᴅᴏ");
-        String clickMsg = config.getString("messages.click-to-equip", "&a&n✔ ᴄʟɪᴄᴋ ᴘᴀʀᴀ ᴇǫᴜɪᴘᴀʀ");
-        String lockedMsg = config.getString("messages.locked", "&c&n✘ ʙʟᴏǫᴜᴇᴀᴅᴏ");
 
+        List<String> subcategories = plugin.getSubcategories(categoryId);
         YamlConfiguration categoryConfig = plugin.getCategoryConfig(categoryId);
-        List<String> defaultLore = plugin.getDefaultLore();
-        int autoSlot = 0;
 
-        for (int i = start; i < end; ++i) {
-            String effectId = effects.get(i);
-
-            if (categoryConfig == null || !categoryConfig.contains(effectId)) {
-                continue;
-            }
-
-            if (!categoryConfig.getBoolean(effectId + ".enable", true)) {
-                continue;
-            }
-
-            String materialStr = categoryConfig.getString(effectId + ".material", "PAPER");
-            if (materialStr == null)
-                materialStr = "PAPER";
+        for (String subcatId : subcategories) {
+            Map<String, String> subcatInfo = plugin.getSubcategoryInfo(categoryId, subcatId);
+            String materialStr = subcatInfo.getOrDefault("material", "PAPER");
             Material mat = Material.matchMaterial(materialStr);
-            if (mat == null) {
-                mat = Material.PAPER;
-            }
+            if (mat == null) mat = Material.PAPER;
 
             ItemStack item = new ItemStack(mat);
-
             if (mat == Material.PLAYER_HEAD || mat == Material.PLAYER_WALL_HEAD) {
-                String skullValue = categoryConfig.getString(effectId + ".skull-value", "");
-                if (skullValue != null && !skullValue.isEmpty()) {
+                String skullValue = subcatInfo.getOrDefault("skull-value", "");
+                if (!skullValue.isEmpty()) {
                     SkullUtils.applySkullTexture(item, skullValue);
                 }
             }
 
             ItemMeta meta = item.getItemMeta();
             if (meta != null) {
-                String display = categoryConfig.getString(effectId + ".display");
-                if (display == null) {
-                    display = effectId;
-                }
-                meta.displayName(ColorUtils.toComponent(display));
+                meta.displayName(ColorUtils.toComponent(subcatInfo.getOrDefault("display", subcatId)));
 
-                if (categoryConfig.contains(effectId + ".custom-model-data")) {
-                    meta.setCustomModelData(categoryConfig.getInt(effectId + ".custom-model-data"));
-                }
-
-                String hex = categoryConfig.getString(effectId + ".hex", "#FFFFFF");
-                String preview = categoryConfig.getString(effectId + ".preview", effectId);
-                String currentStatus;
-                if (effectId.equalsIgnoreCase(activeEffect)) {
-                    currentStatus = equippedMsg;
-                } else {
-                    String perm = categoryConfig.getString(effectId + ".permission");
-                    if (perm == null || perm.isEmpty()) {
-                        currentStatus = clickMsg;
-                    } else if (!player.hasPermission(perm)) {
-                        currentStatus = lockedMsg;
-                    } else {
-                        currentStatus = clickMsg;
-                    }
+                String customModelDataStr = subcatInfo.getOrDefault("custom-model-data", "");
+                if (!customModelDataStr.isEmpty()) {
+                    try {
+                        meta.setCustomModelData(Integer.parseInt(customModelDataStr));
+                    } catch (NumberFormatException ignored) {}
                 }
 
-                List<String> rawLore;
-                if (categoryConfig.contains(effectId + ".lore")) {
-                    rawLore = categoryConfig.getStringList(effectId + ".lore");
-                } else {
-                    rawLore = defaultLore;
-                }
-
+                List<String> rawLore = categoryConfig != null
+                        ? categoryConfig.getStringList("subcategories." + subcatId + ".lore")
+                        : new ArrayList<>();
                 List<Component> finalLore = new ArrayList<>();
-                if (rawLore != null) {
-                    for (String line : rawLore) {
-                        String formattedLine = line.replace("{hex}", hex).replace("{preview}", preview)
-                                .replace("{status}", currentStatus);
-                        finalLore.add(ColorUtils.toComponent(formattedLine));
-                    }
+                for (String line : rawLore) {
+                    finalLore.add(ColorUtils.toComponent(line));
                 }
-
-                NamespacedKey nKey = new NamespacedKey(plugin, "effect_id");
-                meta.getPersistentDataContainer().set(nKey, PersistentDataType.STRING, effectId);
                 meta.lore(finalLore);
+
+                meta.getPersistentDataContainer().set(new NamespacedKey(plugin, "category_id"),
+                        PersistentDataType.STRING, categoryId);
+                meta.getPersistentDataContainer().set(new NamespacedKey(plugin, "subcategory_id"),
+                        PersistentDataType.STRING, subcatId);
                 item.setItemMeta(meta);
             }
 
-            int targetSlot;
-            if (categoryConfig.contains(effectId + ".slot")) {
-                targetSlot = categoryConfig.getInt(effectId + ".slot");
-            } else {
-                targetSlot = autoSlot++;
+            String slotStr = subcatInfo.getOrDefault("slot", "0");
+            int slot = 0;
+            try { slot = Integer.parseInt(slotStr); } catch (NumberFormatException ignored) {}
+            if (slot >= 0 && slot < size) {
+                inv.setItem(slot, item);
+            }
+        }
+
+        if (config.getBoolean("navigation.back-main.enable", true)) {
+            inv.setItem(config.getInt("navigation.back-main.slot", 45),
+                    createNavigationItem(config, "navigation.back-main", -1, -1));
+        }
+
+        player.openInventory(inv);
+    }
+
+    private static void openCategoryEffectsMenu(Player player, CustomEffects plugin, String categoryId, String subcategoryId, int page) {
+        ConfigurationSection config = plugin.getConfig();
+        UUID uuid = player.getUniqueId();
+        String activeEffect = plugin.getDatabase().getActiveEffect(uuid);
+
+        String displayTitle;
+        if (subcategoryId != null && !subcategoryId.isEmpty()) {
+            Map<String, String> subcatInfo = plugin.getSubcategoryInfo(categoryId, subcategoryId);
+            displayTitle = subcatInfo.getOrDefault("display", subcategoryId);
+        } else {
+            displayTitle = config.getString("main-menu.categories." + categoryId + ".display-submenu",
+                    config.getString("main-menu.categories." + categoryId + ".display", categoryId));
+        }
+
+        String titleSuffix = subcategoryId != null && !subcategoryId.isEmpty()
+                ? " &8\u2502" + categoryId + ":" + subcategoryId
+                : "";
+        Component menuTitle = ColorUtils.toComponent(displayTitle + " &8- P\u00e1g. " + (page + 1) + titleSuffix);
+
+        int size = plugin.getSubMenuSize();
+        Inventory inv = Bukkit.createInventory(null, size, menuTitle);
+
+        List<String> effects;
+        if (subcategoryId != null && !subcategoryId.isEmpty()) {
+            effects = plugin.getEffectsBySubcategory(categoryId, subcategoryId);
+        } else {
+            effects = plugin.getEffectsByCategory(categoryId);
+        }
+
+        int effectsPerPage = plugin.getEffectsPerPage();
+        int start = page * effectsPerPage;
+        int end = Math.min(start + effectsPerPage, effects.size());
+
+        String equippedMsg = config.getString("messages.equipped", "&e&n*\u1107 \u1230\u1211\u1260\u1298");
+        String clickMsg = config.getString("messages.click-to-equip", "&a&n\u2714 \u1240\u1238\u1239 \u124a\u122a\u124a \u1230\u1260\u123a\u1260\u1237");
+        String lockedMsg = config.getString("messages.locked", "&c&n\u2718 \u1260\u1235\u123c\u1260\u1248\u1230\u1235");
+
+        YamlConfiguration categoryConfig = plugin.getCategoryConfig(categoryId);
+        List<String> defaultLore = plugin.getDefaultLore();
+        int autoSlot = 0;
+
+        // 1. Cargar Efectos
+        for (int i = start; i < end; ++i) {
+            String effectId = effects.get(i);
+            if (categoryConfig == null || !categoryConfig.contains(effectId)
+                    || !categoryConfig.getBoolean(effectId + ".enable", true))
+                continue;
+
+            String materialStr = categoryConfig.getString(effectId + ".material", "PAPER");
+            Material mat = Material.matchMaterial(materialStr != null ? materialStr : "PAPER");
+            if (mat == null)
+                mat = Material.PAPER;
+
+            ItemStack item = new ItemStack(mat);
+            if (mat == Material.PLAYER_HEAD || mat == Material.PLAYER_WALL_HEAD) {
+                String skullValue = categoryConfig.getString(effectId + ".skull-value", "");
+                if (skullValue != null && !skullValue.isEmpty())
+                    SkullUtils.applySkullTexture(item, skullValue);
             }
 
-            if (targetSlot >= 0 && targetSlot < 45) {
+            ItemMeta meta = item.getItemMeta();
+            if (meta != null) {
+                meta.displayName(ColorUtils.toComponent(categoryConfig.getString(effectId + ".display", effectId)));
+                if (categoryConfig.contains(effectId + ".custom-model-data"))
+                    meta.setCustomModelData(categoryConfig.getInt(effectId + ".custom-model-data"));
+
+                String hex = categoryConfig.getString(effectId + ".hex", "#FFFFFF");
+                String preview = categoryConfig.getString(effectId + ".preview", effectId);
+                String currentStatus = effectId.equalsIgnoreCase(activeEffect) ? equippedMsg
+                        : (player.hasPermission(categoryConfig.getString(effectId + ".permission", "")) ? clickMsg
+                                : lockedMsg);
+
+                List<String> rawLore = categoryConfig.contains(effectId + ".lore")
+                        ? categoryConfig.getStringList(effectId + ".lore")
+                        : defaultLore;
+                List<Component> finalLore = new ArrayList<>();
+                for (String line : rawLore)
+                    finalLore.add(ColorUtils.toComponent(line.replace("{hex}", hex).replace("{preview}", preview)
+                            .replace("{status}", currentStatus)));
+
+                meta.getPersistentDataContainer().set(new NamespacedKey(plugin, "effect_id"), PersistentDataType.STRING,
+                        effectId);
+                meta.lore(finalLore);
+                item.setItemMeta(meta);
+            }
+            int targetSlot = categoryConfig.getInt(effectId + ".slot", autoSlot++);
+            if (targetSlot >= 0 && targetSlot < size)
                 inv.setItem(targetSlot, item);
+        }
+
+        // 2. Cargar Formatos (con soporte para enable)
+        String currentStyle = plugin.getDatabase().getStyle(player.getUniqueId());
+        ConfigurationSection formatItems = config.getConfigurationSection("format-menu.items");
+        if (formatItems != null) {
+            for (String key : formatItems.getKeys(false)) {
+                String path = "format-menu.items." + key + ".";
+                if (!config.getBoolean(path + "enable", true))
+                    continue;
+
+                ItemStack item = new ItemStack(Material.matchMaterial(config.getString(path + "material", "PAPER")));
+                ItemMeta meta = item.getItemMeta();
+                if (meta != null) {
+                    String style = config.getString(path + "style", "");
+                    boolean isActive = (style != null && style.equals(currentStyle))
+                            || (style.isEmpty() && (currentStyle == null || currentStyle.isEmpty()));
+                    meta.displayName(
+                            ColorUtils.toComponent(config.getString(path + "display", key) + (isActive ? " &a\u2714" : "")));
+                    if (config.contains(path + "custom-model-data"))
+                        meta.setCustomModelData(config.getInt(path + "custom-model-data"));
+
+                    List<String> lore = config.getStringList(path + "lore");
+                    List<Component> translatedLore = new ArrayList<>();
+                    for (String line : lore)
+                        translatedLore.add(ColorUtils.toComponent(line));
+                    meta.lore(translatedLore);
+
+                    meta.getPersistentDataContainer().set(new NamespacedKey(plugin, "format_style"),
+                            PersistentDataType.STRING, style);
+                    meta.getPersistentDataContainer().set(new NamespacedKey(plugin, "pending_effect"),
+                            PersistentDataType.STRING, "");
+                    meta.getPersistentDataContainer().set(new NamespacedKey(plugin, "pending_category"),
+                            PersistentDataType.STRING, categoryId);
+                    meta.getPersistentDataContainer().set(new NamespacedKey(plugin, "pending_subcategory"),
+                            PersistentDataType.STRING, subcategoryId != null ? subcategoryId : "");
+                    item.setItemMeta(meta);
+                }
+                int slot = config.getInt(path + "slot", 0);
+                if (slot >= 0 && slot < size)
+                    inv.setItem(slot, item);
             }
         }
 
-        inv.setItem(config.getInt("navigation.back-main.slot", 45),
-                createNavigationItem(config, "navigation.back-main", -1, -1));
-        inv.setItem(config.getInt("reset-item.slot", 49), createNavigationItem(config, "reset-item", -1, -1));
-
-        int formatSlot = config.getInt("format-button.slot", 46);
-        String formatMatStr = config.getString("format-button.material", "PAPER");
-        Material formatMat = Material.matchMaterial(formatMatStr);
-        if (formatMat == null) formatMat = Material.PAPER;
-        ItemStack formatItem = new ItemStack(formatMat);
-        ItemMeta formatMeta = formatItem.getItemMeta();
-        if (formatMeta != null) {
-            String formatDisplay = config.getString("format-button.display", "&b✦ ғᴏʀᴍᴀᴛᴏ ᴅᴇ ᴛᴇxᴛᴏ");
-            formatMeta.displayName(ColorUtils.toComponent(formatDisplay));
-            if (config.contains("format-button.custom-model-data")) {
-                formatMeta.setCustomModelData(config.getInt("format-button.custom-model-data"));
-            }
-            List<String> formatLore = config.getStringList("format-button.lore");
-            List<Component> formatTranslatedLore = new ArrayList<>();
-            for (String line : formatLore) {
-                formatTranslatedLore.add(ColorUtils.toComponent(line));
-            }
-            formatMeta.lore(formatTranslatedLore);
-            NamespacedKey formatKey = new NamespacedKey(plugin, "open_format");
-            formatMeta.getPersistentDataContainer().set(formatKey, PersistentDataType.STRING, categoryId);
-            formatItem.setItemMeta(formatMeta);
+        // 3. Navegacion (con soporte para enable)
+        if (config.getBoolean("navigation.back-main.enable", true)) {
+            inv.setItem(config.getInt("navigation.back-main.slot", 45),
+                    createNavigationItem(config, "navigation.back-main", -1, -1));
         }
-        if (formatSlot >= 0 && formatSlot < size) {
-            inv.setItem(formatSlot, formatItem);
+        if (config.getBoolean("reset-item.enable", true)) {
+            inv.setItem(config.getInt("reset-item.slot", 49), createNavigationItem(config, "reset-item", -1, -1));
         }
-        if (page > 0) {
+        if (config.getBoolean("format-button.enable", false)) {
+            inv.setItem(config.getInt("format-button.slot", 46), createNavigationItem(config, "format-button", -1, -1));
+        }
+        if (page > 0 && config.getBoolean("navigation.previous-page.enable", true)) {
             inv.setItem(config.getInt("navigation.previous-page.slot", 48),
                     createNavigationItem(config, "navigation.previous-page", -1, page));
         }
-
-        if (end < effects.size()) {
+        if (end < effects.size() && config.getBoolean("navigation.next-page.enable", true)) {
             inv.setItem(config.getInt("navigation.next-page.slot", 50),
                     createNavigationItem(config, "navigation.next-page", page + 2, -1));
         }
@@ -253,9 +338,11 @@ public class MenuCreator {
             for (String key : items.getKeys(false)) {
                 String path = "format-menu.items." + key + ".";
                 String materialStr = config.getString(path + "material", "PAPER");
-                if (materialStr == null) materialStr = "PAPER";
+                if (materialStr == null)
+                    materialStr = "PAPER";
                 Material mat = Material.matchMaterial(materialStr);
-                if (mat == null) mat = Material.PAPER;
+                if (mat == null)
+                    mat = Material.PAPER;
 
                 ItemStack item = new ItemStack(mat);
                 ItemMeta meta = item.getItemMeta();
@@ -265,7 +352,7 @@ public class MenuCreator {
                     boolean isActive = (style != null && style.equals(currentStyle))
                             || (style.isEmpty() && (currentStyle == null || currentStyle.isEmpty()));
 
-                    String activeIndicator = isActive ? " &a✔" : "";
+                    String activeIndicator = isActive ? " &a\u2714" : "";
                     meta.displayName(ColorUtils.toComponent((display != null ? display : key) + activeIndicator));
 
                     if (config.contains(path + "custom-model-data")) {
@@ -280,18 +367,21 @@ public class MenuCreator {
                     meta.lore(translatedLore);
 
                     NamespacedKey styleKey = new NamespacedKey(plugin, "format_style");
-                    meta.getPersistentDataContainer().set(styleKey, PersistentDataType.STRING, style != null ? style : "");
+                    meta.getPersistentDataContainer().set(styleKey, PersistentDataType.STRING,
+                            style != null ? style : "");
 
                     NamespacedKey effectKey = new NamespacedKey(plugin, "pending_effect");
-                    meta.getPersistentDataContainer().set(effectKey, PersistentDataType.STRING, effectId != null ? effectId : "");
+                    meta.getPersistentDataContainer().set(effectKey, PersistentDataType.STRING,
+                            effectId != null ? effectId : "");
 
                     NamespacedKey categoryKey = new NamespacedKey(plugin, "pending_category");
-                    meta.getPersistentDataContainer().set(categoryKey, PersistentDataType.STRING, categoryId != null ? categoryId : "");
+                    meta.getPersistentDataContainer().set(categoryKey, PersistentDataType.STRING,
+                            categoryId != null ? categoryId : "");
 
                     item.setItemMeta(meta);
                 }
 
-                int slot = config.getInt(path + "slot", 0);
+                int slot = config.getInt(path + ".slot", 0);
                 if (slot >= 0 && slot < size) {
                     inv.setItem(slot, item);
                 }
@@ -312,8 +402,9 @@ public class MenuCreator {
         ItemStack item = new ItemStack(mat);
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
-            String display = config.getString(path + ".display", path); 
-            if (display == null) display = path;
+            String display = config.getString(path + ".display", path);
+            if (display == null)
+                display = path;
             meta.displayName(ColorUtils.toComponent(display));
 
             if (config.contains(path + ".custom-model-data")) {
@@ -322,7 +413,7 @@ public class MenuCreator {
 
             List<String> lore = config.getStringList(path + ".lore");
             List<Component> finalLore = new ArrayList<>();
-            for (String line : lore) { 
+            for (String line : lore) {
                 String parsed = line
                         .replace("{next}", String.valueOf(nextPg))
                         .replace("{prev}", String.valueOf(prevPg));

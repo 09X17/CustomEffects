@@ -9,7 +9,7 @@ import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 
 public class ColorUtils {
-    
+
     private static final Pattern HEX_PATTERN = Pattern.compile("(?:&#|#)([0-9a-fA-F]{6})");
     private static final MiniMessage MINI_MESSAGE = MiniMessage.miniMessage();
     private static final LegacyComponentSerializer LEGACY_SERIALIZER = LegacyComponentSerializer.builder()
@@ -19,27 +19,29 @@ public class ColorUtils {
 
     @NotNull
     public static String translate(@NotNull String message) {
-        if (message.isEmpty()) return "";
+        if (message.isEmpty())
+            return "";
         return LEGACY_SERIALIZER.serialize(toComponent(message));
     }
 
     @NotNull
     public static Component toComponent(@NotNull String message) {
-        if (message.isEmpty()) return Component.empty();
-        
+        if (message.isEmpty())
+            return Component.empty();
+
         String normalized = message.replace('§', '&');
-   
+        String baseFormat = "<reset><italic:false>";
+
         if (!normalized.contains("&") && normalized.contains("<")) {
-            return MINI_MESSAGE.deserialize(normalized);
+            return MINI_MESSAGE.deserialize(baseFormat + normalized);
         }
-        
+
         String converted = HEX_PATTERN.matcher(normalized).replaceAll("<#$1>");
-        
         converted = convertLegacyToMiniMessage(converted);
-        
-        return MINI_MESSAGE.deserialize(converted);
+
+        return MINI_MESSAGE.deserialize(baseFormat + converted);
     }
-    
+
     private static String convertLegacyToMiniMessage(String text) {
         StringBuilder result = new StringBuilder();
         int i = 0;
@@ -69,7 +71,7 @@ public class ColorUtils {
         }
         return result.toString();
     }
-    
+
     private static String getMiniMessageTag(char code) {
         return switch (Character.toLowerCase(code)) {
             case '0' -> "black";
@@ -97,6 +99,7 @@ public class ColorUtils {
             default -> null;
         };
     }
+
     @NotNull
     public static String hexToMiniMessage(@NotNull String hex) {
         String cleanHex = hex.replace("§", "").replace("#", "").replace("&", "");
@@ -105,7 +108,8 @@ public class ColorUtils {
 
     @NotNull
     public static String applyStyle(@NotNull String text, @NotNull String style) {
-        if (style.isEmpty()) return text;
+        if (style.isEmpty())
+            return text;
 
         StringBuilder openTags = new StringBuilder();
         StringBuilder closeTags = new StringBuilder();
@@ -128,12 +132,16 @@ public class ColorUtils {
 
     @NotNull
     public static String styleToLegacy(@NotNull String style) {
-        if (style.isEmpty()) return "";
+        if (style.isEmpty())
+            return "";
 
         StringBuilder codes = new StringBuilder();
-        if (style.contains("bold")) codes.append("&l");
-        if (style.contains("underline")) codes.append("&n");
-        if (style.contains("italic")) codes.append("&o");
+        if (style.contains("bold"))
+            codes.append("&l");
+        if (style.contains("underline"))
+            codes.append("&n");
+        if (style.contains("italic"))
+            codes.append("&o");
         return codes.toString();
     }
 }
