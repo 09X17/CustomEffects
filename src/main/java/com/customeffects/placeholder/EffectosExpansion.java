@@ -1,20 +1,26 @@
 package com.customeffects.placeholder;
 
-import java.util.UUID;
-
+import com.customeffects.CustomEffects;
+import com.customeffects.models.Category;
+import com.customeffects.models.Effect;
+import com.customeffects.services.DataManager;
+import com.customeffects.services.VoucherService;
+import com.customeffects.utils.ColorUtils;
+import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-import com.customeffects.CustomEffects;
-import com.customeffects.utils.ColorUtils;
-
-import me.clip.placeholderapi.expansion.PlaceholderExpansion;
+import java.util.UUID;
 
 public class EffectosExpansion extends PlaceholderExpansion {
     private final CustomEffects plugin;
+    private final DataManager dataManager;
+    private final VoucherService voucherService;
 
     public EffectosExpansion(CustomEffects plugin) {
         this.plugin = plugin;
+        this.dataManager = plugin.getDataManager();
+        this.voucherService = plugin.getVoucherService();
     }
 
     @Override
@@ -39,58 +45,62 @@ public class EffectosExpansion extends PlaceholderExpansion {
 
     @Override
     public String onPlaceholderRequest(Player player, @NotNull String params) {
-        if (player == null)
-            return "";
+        if (player == null) return "";
 
         UUID uuid = player.getUniqueId();
-        if (this.plugin.getDatabase().getActiveEffect(uuid) == null
-                && this.plugin.getDatabase().getPrefix(uuid) == null) {
-            this.plugin.getDatabase().loadPlayerData(uuid);
+        if (plugin.getDatabase().getActiveEffect(uuid) == null
+                && plugin.getDatabase().getPrefix(uuid) == null) {
+            plugin.getDatabase().loadPlayerData(uuid);
         }
 
-        String effectId = this.plugin.getDatabase().getActiveEffect(uuid);
-        String hex = this.plugin.getDatabase().getHex(uuid);
-        String style = this.plugin.getDatabase().getStyle(uuid);
-        String prefix = this.plugin.getDatabase().getPrefix(uuid);
+        String effectId = plugin.getDatabase().getActiveEffect(uuid);
+        String hex = plugin.getDatabase().getHex(uuid);
+        String style = plugin.getDatabase().getStyle(uuid);
+        String prefix = plugin.getDatabase().getPrefix(uuid);
 
-        switch (params.toLowerCase()) {
-            case "hex":
-                return hex != null && !hex.isEmpty() ? hex : "#FFFFFF";
-            case "effect":
-                return effectId != null && !effectId.isEmpty() ? effectId : "NONE";
-            case "has_effect":
-                return effectId != null && !effectId.isEmpty() ? "true" : "false";
-            case "prefix":
-                if (prefix != null && !prefix.isEmpty()) {
-                    return ColorUtils.translate(prefix);
+        return switch (params.toLowerCase()) {
+            case "hex" -> hex != null && !hex.isEmpty() ? hex : "#FFFFFF";
+            case "effect" -> effectId != null && !effectId.isEmpty() ? effectId : "NONE";
+            case "has_effect" -> effectId != null && !effectId.isEmpty() ? "true" : "false";
+            case "prefix" -> {
+                // Verificar si el jugador tiene un prefix animado
+                if (plugin.getAnimatedPrefixService().isAnimated(uuid)) {
+                    Effect animatedEffect = plugin.getAnimatedPrefixService().getAnimatedEffect(uuid);
+                    if (animatedEffect != null) {
+                        int currentFrame = plugin.getAnimatedPrefixService().getCurrentFrame(uuid);
+                        String framePrefix = animatedEffect.getPrefixFrame(currentFrame);
+                        yield ColorUtils.translate(framePrefix);
+                    }
                 }
-                // Si no hay prefix custom, obtener de LuckPerms
-                return getLuckPermsPrefix(player);
-            case "has_prefix":
                 if (prefix != null && !prefix.isEmpty()) {
-                    return "true";
+                    yield ColorUtils.translate(prefix);
                 }
-                // Verificar si tiene prefix en LuckPerms
-                String luckPermsPrefix = getLuckPermsPrefix(player);
-                return luckPermsPrefix != null && !luckPermsPrefix.isEmpty() ? "true" : "false";
-            case "format":
+                yield plugin.getLuckPermsPrefix(player);
+            }
+            case "has_prefix" -> {
+                if (prefix != null && !prefix.isEmpty()) {
+                    yield "true";
+                }
+                String luckPermsPrefix = plugin.getLuckPermsPrefix(player);
+                yield luckPermsPrefix != null && !luckPermsPrefix.isEmpty() ? "true" : "false";
+            }
+            case "format" -> {
                 String s1 = ColorUtils.styleToLegacy(style != null ? style : "");
-                return hex != null && !hex.isEmpty()
+                yield hex != null && !hex.isEmpty()
                         ? ColorUtils.translate(hex + s1 + player.getName())
                         : ColorUtils.translate("&f" + s1 + player.getName());
-            case "styled":
-                return ColorUtils.styleToLegacy(style != null ? style : "");
-            case "minimessage":
-            case "styled_minimessage":
+            }
+            case "styled" -> ColorUtils.styleToLegacy(style != null ? style : "");
+            case "minimessage", "styled_minimessage" -> {
                 if (hex != null && !hex.isEmpty()) {
                     String cleanHex = hex.replace("§", "").replace("#", "").replace("&", "");
-                    return ColorUtils.applyStyle("<#" + cleanHex + ">" + player.getName(), style != null ? style : "");
+                    yield ColorUtils.applyStyle("<#" + cleanHex + ">" + player.getName(), style != null ? style : "");
                 }
-                return ColorUtils.applyStyle("<white>" + player.getName(), style != null ? style : "");
-            case "style":
-                if (style == null || style.isEmpty())
-                    return "Sin Formato";
-                return switch (style) {
+                yield ColorUtils.applyStyle("<white>" + player.getName(), style != null ? style : "");
+            }
+            case "style" -> {
+                if (style == null || style.isEmpty()) yield "Sin Formato";
+                yield switch (style) {
                     case "bold" -> "Bold";
                     case "underline" -> "Underline";
                     case "italic" -> "Italic";
@@ -100,73 +110,53 @@ public class EffectosExpansion extends PlaceholderExpansion {
                     case "bold_underline_italic" -> "Bold+Underline+Italic";
                     default -> style;
                 };
-            case "style_code":
-                return ColorUtils.styleToLegacy(style != null ? style : "");
-            case "name":
-                if (effectId == null || effectId.isEmpty())
-                    return "Ninguno";
-                return ColorUtils.translate(this.plugin.getEffectDisplay(effectId));
-            case "preview":
-                return getEffectPreview(effectId);
-            case "status":
-                return effectId != null && !effectId.isEmpty() ? "EQUIPPED" : "NONE";
-            case "hex_minimessage":
+            }
+            case "style_code" -> ColorUtils.styleToLegacy(style != null ? style : "");
+            case "name" -> {
+                if (effectId == null || effectId.isEmpty()) yield "Ninguno";
+                yield voucherService.getEffectDisplay(effectId);
+            }
+            case "preview" -> getEffectPreview(effectId);
+            case "status" -> effectId != null && !effectId.isEmpty() ? "EQUIPPED" : "NONE";
+            case "hex_minimessage" -> {
                 if (hex != null && !hex.isEmpty()) {
-                    return ColorUtils.hexToMiniMessage(hex);
+                    yield ColorUtils.hexToMiniMessage(hex);
                 }
-                return "<white>";
-            case "decorated_name":
+                yield "<white>";
+            }
+            case "decorated_name" -> {
                 String s2 = ColorUtils.styleToLegacy(style != null ? style : "");
-                return hex != null && !hex.isEmpty()
+                yield hex != null && !hex.isEmpty()
                         ? ColorUtils.translate(hex + s2 + player.getName() + "&r")
                         : player.getName();
-            default:
-                return null;
-        }
+            }
+            default -> null;
+        };
     }
 
     private String getEffectPreview(String effectId) {
         if (effectId == null || effectId.isEmpty()) {
             return "Sin Efecto";
         }
-        var categoriesSection = this.plugin.getConfig().getConfigurationSection("main-menu.categories");
-        if (categoriesSection != null) {
-            for (String category : categoriesSection.getKeys(false)) {
-                var categoryConfig = this.plugin.getCategoryConfig(category);
-                if (categoryConfig != null && categoryConfig.contains(effectId)) {
-                    String preview = categoryConfig.getString(effectId + ".preview", effectId);
-                    return ColorUtils.translate(preview != null ? preview : effectId);
-                }
+        for (Category category : dataManager.getAllCategories()) {
+            Effect effect = category.getEffectById(effectId);
+            if (effect != null) {
+                return ColorUtils.translate(effect.getPreview());
             }
         }
         return effectId;
     }
 
-    private String getLuckPermsPrefix(Player player) {
-        try {
-            if (this.plugin.getServer().getPluginManager().getPlugin("LuckPerms") == null) {
-                this.plugin.getLogger().warning("[DEBUG] LuckPerms no está instalado");
-                return "";
-            }
-
-            net.luckperms.api.LuckPerms luckPerms = net.luckperms.api.LuckPermsProvider.get();
-            net.luckperms.api.model.user.User user = luckPerms.getUserManager().getUser(player.getUniqueId());
-            if (user == null) {
-                return "";
-            }
-
-            // Obtener el prefix del grupo/rango actual (heredado)
-            String prefixRaw = user.getCachedData().getMetaData().getPrefix();
-
-            if (prefixRaw != null && !prefixRaw.isEmpty()) {
-                String translatedValue = ColorUtils.translate(prefixRaw);
-                return translatedValue;
-            } else {
-            }
-        } catch (Exception e) {
-            this.plugin.getLogger().warning("Error al obtener prefix de LuckPerms: " + e.getMessage());
-            e.printStackTrace();
+    private String getEffectName(String effectId) {
+        if (effectId == null || effectId.isEmpty()) {
+            return "Ninguno";
         }
-        return "";
+        for (Category category : dataManager.getAllCategories()) {
+            Effect effect = category.getEffectById(effectId);
+            if (effect != null) {
+                return ColorUtils.translate(effect.getDisplay());
+            }
+        }
+        return effectId;
     }
 }

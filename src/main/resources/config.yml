@@ -1,7 +1,7 @@
 # ==========================================
 #         PREFIJO CONFIGURABLE
 # ==========================================
-prefix: "#a10100&lE#b41301&lF#c72403&lE#da3604&lC#e64607&lT#f2550a&lO#fe650d&lS&r &7➛  "
+prefix: '#a10100&lE#b41301&lF#c72403&lE#da3604&lC#e64607&lT#f2550a&lO#fe650d&lS&r &7➛  '
 
 # ==========================================
 #         BASE DE DATOS
@@ -10,96 +10,215 @@ prefix: "#a10100&lE#b41301&lF#c72403&lE#da3604&lC#e64607&lT#f2550a&lO#fe650d&lS&
 #    los mismos datos de efectos y formatos.
 # ==========================================
 database:
-  type: "sqlite"
+  type: sqlite
   mysql:
-    host: "127.0.0.1"
+    host: 127.0.0.1
     port: 3306
-    database: "customeffects"
-    username: "root"
-    password: ""
-    table-prefix: "ce_"
+    database: customeffects
+    username: root
+    password: ''
+    table-prefix: ce_
 
 # ==========================================
 #         LORE POR DEFECTO
 # ==========================================
 default-lore:
-  - "&8ᴇғᴇᴄᴛᴏs ᴘʀᴇᴍɪᴜᴍ"
-  - " &c▹ ᴅᴀᴛᴏs"
-  - " &7▸ &7Colores cambiantes"
-  - " &7▸ &7Ideal para destacar"
-  - " "
-  - " &c▹ ɪɴғᴏʀᴍᴀᴄɪóɴ"
-  - " &7▸ &7Se ve: &f{preview}"
-  - " &7▸ &7Estado: &f{status}"
+  - '&8ᴇғᴇᴄᴛᴏs ᴘʀᴇᴍɪᴜᴍ'
+  - ' &c▹ ᴅᴀᴛᴏs'
+  - ' &7▸ &7Colores cambiantes'
+  - ' &7▸ &7Ideal para destacar'
+  - ' '
+  - ' &c▹ ɪɴғᴏʀᴍᴀᴄɪóɴ'
+  - ' &7▸ &7Se ve: &f{preview}'
+  - ' &7▸ &7Estado: &f{status}'
 
 main-menu:
-  title: "&8&lEFFECTOS &7- &fMenú Principal"
-  size: 27
+  title: <shift:-8><glyph:hl_glow3>
+  size: 54
   categories:
     rainbows:
       enable: true
-      slot: 11
+      slot: 15
       material: PAPER
-      custom-model-data: 90005
-      display: "#F8F85C&nᴇғᴇᴄᴛᴏs ᴅɪɴáᴍɪᴄᴏs"
-      display-submenu: "<glyph:nexoid> #F8F85C&nᴇғᴇᴄᴛᴏs ᴅɪɴáᴍɪᴄᴏs"
+      custom-model-data: 4
+      display: '#F8F85C&nᴇғᴇᴄᴛᴏs ᴅɪɴáᴍɪᴄᴏs'
+      display-submenu: <shift:-8><glyph:hl_glow3>
       lore:
-        - ""
-        - " &d✴&n ᴅᴇsᴄʀɪᴘᴄɪóɴ:"
-        - " &f▸ &7ᴇғᴇᴄᴛᴏs ᴄᴏɴ ᴄᴏʟᴏʀᴇs"
-        - " &f▸ &7ᴅɪɴáᴍɪᴄᴏs ʏ ᴀɴɪᴍᴀᴄɪᴏɴᴇs"
-        - " &f▸ &7ᴄʀᴏᴍáᴛɪᴄᴀs ᴇɴ ᴍᴏᴠɪᴍɪᴇɴᴛᴏ."
-        - ""
-        - " &e✦&n ᴄʟɪᴄ ᴘᴀʀᴀ ᴀʙʀɪʀ"
+        - ''
+        - ' &d✴&n ᴅᴇsᴄʀɪᴘᴄɪóɴ:'
+        - ' &f▸ &7ᴇғᴇᴄᴛᴏs ᴄᴏɴ ᴄᴏʟᴏʀᴇs'
+        - ' &f▸ &7ᴅɪɴáᴍɪᴄᴏs ʏ ᴀɴɪᴍᴀᴄɪᴏɴᴇs'
+        - ' &f▸ &7ᴄʀᴏᴍáᴛɪᴄᴀs ᴇɴ ᴍᴏᴠɪᴍɪᴇɴᴛᴏ.'
+        - ''
+        - ' &e✦&n ᴄʟɪᴄ ᴘᴀʀᴀ ᴀʙʀɪʀ'
     basic_colors:
-      enable: true
+      enable: false
       slot: 13
       material: PAPER
       custom-model-data: 90006
-      display: "#F8F888&nᴇғᴇᴄᴛᴏs ᴍᴏɴᴏᴄʀᴏᴍáᴛɪᴄᴏs"
+      display: '#F8F888&nᴇғᴇᴄᴛᴏs ᴍᴏɴᴏᴄʀᴏᴍáᴛɪᴄᴏs'
       lore:
-        - ""
-        - " &a✴&n ᴅᴇsᴄʀɪᴘᴄɪóɴ:"
-        - " &f▸ &7ᴇғᴇᴄᴛᴏs ᴄᴏɴ ᴛᴏɴᴏs"
-        - " &f▸ &7ᴇsᴛáᴛɪᴄᴏs ʏ ᴇʟᴇɢᴀɴᴛᴇs"
-        - " &f▸ &7ʙᴀsᴀᴅᴏs ᴇɴ ᴄᴏʟᴏʀᴇs"
-        - " &f▸ &7ᴜɴɪғᴏʀᴍᴇs ʏ ʟɪᴍᴘɪᴏs."
-        - ""
-        - " &e✦&n ᴄʟɪᴄ ᴘᴀʀᴀ ᴀʙʀɪʀ"
+        - ''
+        - ' &a✴&n ᴅᴇsᴄʀɪᴘᴄɪóɴ:'
+        - ' &f▸ &7ᴇғᴇᴄᴛᴏs ᴄᴏɴ ᴛᴏɴᴏs'
+        - ' &f▸ &7ᴇsᴛáᴛɪᴄᴏs ʏ ᴇʟᴇɢᴀɴᴛᴇs'
+        - ' &f▸ &7ʙᴀsᴀᴅᴏs ᴇɴ ᴄᴏʟᴏʀᴇs'
+        - ' &f▸ &7ᴜɴɪғᴏʀᴍᴇs ʏ ʟɪᴍᴘɪᴏs.'
+        - ''
+        - ' &e✦&n ᴄʟɪᴄ ᴘᴀʀᴀ ᴀʙʀɪʀ'
     mechanics:
-      enable: true
+      enable: false
       slot: 15
       material: PAPER
       custom-model-data: 90007
-      display: "#F8F854&nᴇғᴇᴄᴛᴏs ᴅᴇ ᴍᴏᴠɪᴍɪᴇɴᴛᴏ"
+      display: '#F8F854&nᴇғᴇᴄᴛᴏs ᴅᴇ ᴍᴏᴠɪᴍɪᴇɴᴛᴏ'
       lore:
-        - " "
-        - " &b✴&n ᴅᴇsᴄʀɪᴘᴄɪóɴ:"
-        - " &f▸ &7ᴇғᴇᴄᴛᴏs ᴄᴏɴ"
-        - " &f▸ &7ᴀɴɪᴍᴀᴄɪᴏɴᴇs,"
-        - " &f▸ &7ᴠɪʙʀᴀᴄɪᴏɴᴇs,"
-        - " &f▸ &7ɢɪʀᴏs ʏ ᴅɪsᴛᴏʀsɪᴏɴᴇs."
-        - ""
-        - " &e✦&n ᴄʟɪᴄ ᴘᴀʀᴀ ᴀʙʀɪʀ"
+        - ' '
+        - ' &b✴&n ᴅᴇsᴄʀɪᴘᴄɪóɴ:'
+        - ' &f▸ &7ᴇғᴇᴄᴛᴏs ᴄᴏɴ'
+        - ' &f▸ &7ᴀɴɪᴍᴀᴄɪᴏɴᴇs,'
+        - ' &f▸ &7ᴠɪʙʀᴀᴄɪᴏɴᴇs,'
+        - ' &f▸ &7ɢɪʀᴏs ʏ ᴅɪsᴛᴏʀsɪᴏɴᴇs.'
+        - ''
+        - ' &e✦&n ᴄʟɪᴄ ᴘᴀʀᴀ ᴀʙʀɪʀ'
     prefixes:
       enable: true
       type: prefix
-      slot: 16
+      slot: 24
       material: PAPER
       custom-model-data: 90008
-      display: "#FFAA00&nᴘʀᴇꜰɪᴊᴏs ᴅᴇ ʀᴀɴɢᴏ"
+      display: '#FFAA00&nᴘʀᴇꜰɪᴊᴏs ᴅᴇ ʀᴀɴɢᴏ'
+      display-submenu: <shift:-8><glyph:hl_glow3>
       lore:
-        - " "
-        - " &6✴&n ᴅᴇsᴄʀɪᴘᴄɪóɴ:"
-        - " &f▸ &7ᴄᴀᴍʙɪᴀ ᴛᴜ ᴘʀᴇꜰɪᴊᴏ"
-        - " &f▸ &7sᴇɢúɴ ᴛᴜ ʀᴀɴɢᴏ"
-        - " &f▸ &7ʏ ᴇsᴛɪʟᴏ ᴘᴇʀsᴏɴᴀʟ."
-        - ""
-        - " &e✦&n ᴄʟɪᴄ ᴘᴀʀᴀ ᴀʙʀɪʀ"
+        - ' '
+        - ' &6✴&n ᴅᴇsᴄʀɪᴘᴄɪóɴ:'
+        - ' &f▸ &7ᴄᴀᴍʙɪᴀ ᴛᴜ ᴘʀᴇꜰɪᴊᴏ'
+        - ' &f▸ &7sᴇɢúɴ ᴛᴜ ʀᴀɴɢᴏ'
+        - ' &f▸ &7ʏ ᴇsᴛɪʟᴏ ᴘᴇʀsᴏɴᴀʟ.'
+        - ''
+        - ' &e✦&n ᴄʟɪᴄ ᴘᴀʀᴀ ᴀʙʀɪʀ'
+    friends_menu:
+      enable: true
+      slot: 42
+      material: PAPER
+      custom-model-data: 90010
+      display: '#55FFFF&nᴍᴇɴú ᴅᴇ ᴀᴍɪɢᴏs'
+      lore:
+        - ''
+        - ' &b✴&n ᴅᴇsᴄʀɪᴘᴄɪóɴ:'
+        - ' &f▸ &7ᴠᴇʀ ᴛᴜs ᴀᴍɪɢᴏs'
+        - ' &f▸ &7ɢᴇsᴛɪᴏɴᴀʀ ᴀᴍɪsᴛᴀᴅᴇs'
+        - ''
+        - ' &e✦&n ᴄʟɪᴄ ᴘᴀʀᴀ ᴀʙʀɪʀ'
+  # Items decorativos del menú principal
+  # Cada item tiene su propio slot, material, display, custom-model-data, item-model, skull-value, lore
+  # Si material es PLAYER_HEAD y skull-value está vacío, usa la skin del jugador
+  # Para no mostrar items, dejar la lista vacía: decorative-items: []
+  decorative-items:
+    - slot: 15
+      material: PLAYER_HEAD
+      display: ' '
+      custom-model-data: 5
+      item-model: 'nexo:2d_player_head_large'
+      skull-value: ''
+      lore: []
 
 subcategory-menu:
   size: 54
   effects-per-page: 45
+  title-format: '{category} &8- Subcategorías'
+
+effects-menu:
+  title-format: '&r{title} &8- Pág. {page}{suffix}'
+  show-suffix: false
+
+# ==========================================
+#         SISTEMA DE AMIGOS
+# ==========================================
+friends:
+  enable: true
+  max-friends: 50
+  request-expiry: 86400
+  notifications:
+    join: true
+    leave: true
+    effect-change: true
+  chat:
+    enable: true
+    format: "&7[&bAmigo&7] &f{sender} &8» &7{message}"
+  messages:
+    request-sent: "%effectos_prefix%&aSolicitud enviada a &f{player}&a."
+    request-received: "%effectos_prefix%&a&f{player} &ate quiere agregar como amigo."
+    accepted: "%effectos_prefix%&aAhora eres amigo de &f{player}&a."
+    removed: "%effectos_prefix%&cYa no eres amigo de &f{player}&c."
+    already-friend: "%effectos_prefix%&eYa eres amigo de &f{player}&e."
+    max-friends: "%effectos_prefix%&cHas alcanzado el máximo de amigos."
+    no-permission: "%effectos_prefix%&cNo tienes permiso."
+    online: "%effectos_prefix%&aTu amigo &f{player} &ase ha conectado."
+    offline: "%effectos_prefix%&cTu amigo &f{player} &cse ha desconectado."
+    friend-accepted: "%effectos_prefix%&f{player} &aha aceptado tu solicitud."
+    friend-removed: "%effectos_prefix%&f{player} &cte ha eliminado de sus amigos."
+
+friends-menu:
+  title: "{player} &8- Amigos"
+  size: 54
+  player-head:
+    slot: 4
+    display: "&a{player}"
+    lore:
+      - ''
+      - ' &7Amigos: &f{friends_count}'
+      - ' &7Conectados: &f{friends_online}'
+      - ''
+  friend-item:
+    display: "&f{friend_name}"
+    lore-online:
+      - ''
+      - ' &7Estado: &aConectado'
+      - ''
+      - ' &e✦ Click para opciones'
+    lore-offline:
+      - ''
+      - ' &7Estado: &cDesconectado'
+      - ''
+  buttons:
+    back:
+      slot: 45
+      material: PAPER
+      custom-model-data: 1202
+      display: "&cᴠᴏʟᴠᴇʀ"
+      lore:
+        - '&r '
+    add-friend:
+      slot: 49
+      material: PAPER
+      custom-model-data: 90011
+      display: "&aᴀɢʀᴇɢᴀʀ ᴀᴍɪɢᴏ"
+      lore:
+        - ''
+        - ' &7Enviar solicitud'
+        - ' &7de amistad'
+        - ''
+    requests:
+      slot: 53
+      material: PAPER
+      custom-model-data: 90012
+      display: "&eꜱᴏʟɪᴄɪᴛᴜᴅᴇꜱ"
+      lore:
+        - ''
+        - ' &7Ver solicitudes'
+        - ' &7pendientes'
+        - ''
+
+# ==========================================
+#         RELLENO DE INVENTARIO
+#    Rellena los espacios vacíos del menú
+# ==========================================
+filler-items:
+  enable: false
+  material: GRAY_STAINED_GLASS_PANE
+  display: ' '
+  custom-model-data: 0
 
 # ==========================================
 #         SISTEMA DE PREFIJOS
@@ -109,110 +228,101 @@ subcategory-menu:
 prefix-system:
   use-luckperms-default: true
   rank-hierarchy:
-    - "default"
-    - "nova"
-    - "nexus"
-    - "void"
-    - "mod"
-    - "admin"
-    - "owner"
+    - default
+    - nova
+    - nexus
+    - void
+    - mod
+    - admin
+    - owner
 
 # ==========================================
 #          BOTONES DE NAVEGACIÓN
 # ==========================================
-
 navigation:
   next-page:
     enable: true
     slot: 50
     material: PAPER
     custom-model-data: 1201
-    display: "&asɪɢᴜɪᴇɴᴛᴇ ᴘáɢɪɴᴀ"
+    display: '&asɪɢᴜɪᴇɴᴛᴇ ᴘáɢɪɴᴀ'
     lore:
-      - "&r "
+      - '&r '
   previous-page:
     enable: true
     slot: 48
     material: PAPER
     custom-model-data: 1202
-    display: "&cᴘáɢɪɴᴀ ᴀɴᴛᴇʀɪᴏʀ"
+    display: '&cᴘáɢɪɴᴀ ᴀɴᴛᴇʀɪᴏʀ'
     lore:
-      - "&r "
+      - '&r '
   back-main:
     enable: true
     slot: 45
     material: PAPER
     custom-model-data: 1202
-    display: "&cᴠᴏʟᴠᴇʀ ᴀʟ ᴍᴇɴú ᴘʀɪɴᴄɪᴘᴀʟ"
+    display: '&cᴠᴏʟᴠᴇʀ ᴀʟ ᴍᴇɴú ᴘʀɪɴᴄɪᴘᴀʟ'
     lore:
-      - "&r "
+      - '&r '
 
 format-button:
   enable: false
   slot: 46
   material: PAPER
   custom-model-data: 1203
-  display: "&b✦ ғᴏʀᴍᴀᴛᴏ ᴅᴇ ᴛᴇxᴛᴏ"
+  display: '&b✦ ғᴏʀᴍᴀᴛᴏ ᴅᴇ ᴛᴇxᴛᴏ'
   lore:
-    - ""
-    - " &7▸ Elige el estilo"
-    - " &7  para tu efecto"
-    - ""
-    - " &e✦ Click para abrir"
+    - ''
+    - ' &7▸ Elige el estilo'
+    - ' &7  para tu efecto'
+    - ''
+    - ' &e✦ Click para abrir'
 
 reset-item:
   enable: true
   slot: 49
   material: PAPER
   custom-model-data: 1190
-  display: "&cᴇʟɪᴍɪɴᴀʀ ᴇғᴇᴄᴛᴏ ᴀᴄᴛɪᴠᴏ"
+  display: '&cᴇʟɪᴍɪɴᴀʀ ᴇғᴇᴄᴛᴏ ᴀᴄᴛɪᴠᴏ'
 
 # ==========================================
 #          SISTEMA GLOBAL Y RECOMPENSAS
 # ==========================================
-
 sounds:
-  click: "UI_BUTTON_CLICK"
-  back: "BLOCK_WOODEN_TRAPDOOR_CLOSE"
-  page-turn: "ITEM_BOOK_PAGE_TURN"
-  equip: "ENTITY_PLAYER_LEVELUP"
-  no-permission: "ENTITY_VILLAGER_NO"
-  already-equipped: "BLOCK_NOTE_BLOCK_PLING"
-  reset: "BLOCK_NOTE_BLOCK_BASS"
+  click: UI_BUTTON_CLICK
+  back: BLOCK_WOODEN_TRAPDOOR_CLOSE
+  page-turn: ITEM_BOOK_PAGE_TURN
+  equip: ENTITY_PLAYER_LEVELUP
+  no-permission: ENTITY_VILLAGER_NO
+  already-equipped: BLOCK_NOTE_BLOCK_PLING
+  reset: BLOCK_NOTE_BLOCK_BASS
 
 messages:
-  unlocked: " &a&n✔ ᴅᴇsʙʟᴏǫᴜᴇᴀᴅᴏ"
-  locked: " &c&n✘ ʙʟᴏǫᴜᴇᴀᴅᴏ"
-  equipped: " &b&n✔ ᴇǫᴜɪᴘᴀᴅᴏ"
-  click-to-equip: " &a&n✔ ᴄʟɪᴄᴋ ᴘᴀʀᴀ ᴇǫᴜɪᴘᴀʀ"
-
-# === MENSAJES DEL CHAT ===
-  voucher-claimed: "%effectos_prefix%&a&l¡VOUCHER CANJEADO! &7Has desbloqueado el efecto: &e{effect}"
-  no-permission: "%effectos_prefix%&r&cNo tienes permiso para usar este efecto."
-  effect-reset-success: "%effectos_prefix%&r&cHas removido tu efecto activo correctamente."
-  equip-success: "%effectos_prefix%&r&7¡Equipado &f{effect}"
-  already-equipped-chat: "%effectos_prefix%&r&eYa tienes este efecto equipado actualmente."
-  already-have-permission: "%effectos_prefix%&r&e¡Ya tienes desbloqueado este efecto!"
-  no-effect-name: "%effectos_prefix%&r&cNinguno"
-  no-effect-preview: "%effectos_prefix%&r&cSin Efecto"
-  welcome-back: "%effectos_prefix%&r&aBienvenido de nuevo. Tu efecto activo: &f{effect}"
-
-# === MENSAJES DE ADMIN ===
-  reload-no-permission: "%effectos_prefix%&cNo tienes permiso para recargar la configuración."
-  reload-success: "%effectos_prefix%&aConfiguración y efectos recargados con éxito."
-  voucher-no-permission: "%effectos_prefix%&cNo tienes permiso para dar vouchers."
-  voucher-usage: "%effectos_prefix%&c§lUso Incorrecto › &7/{cmd} givevoucher <jugador> <id_efecto>"
-  player-not-found: "%effectos_prefix%&cEl jugador '&f{player}&c' no se encuentra conectado."
-  voucher-not-found: "%effectos_prefix%&cNo se encontró ningún voucher configurado para el efecto: &e{effect}"
-  voucher-given-sender: "%effectos_prefix%&aHas entregado 1x Voucher de &e{effect} &aa &f{player}&a."
-  voucher-given-target: "%effectos_prefix%&a¡Has recibido un voucher para el efecto: &e{effect}&a!"
-  voucher-corrupt: "%effectos_prefix%&cEste voucher está corrupto o el efecto ya no existe en la configuración."
+  unlocked: ' &a&n✔ ᴅᴇsʙʟᴏǫᴜᴇᴀᴅᴏ'
+  locked: ' &c&n✘ ʙʟᴏǫᴜᴇᴀᴅᴏ'
+  equipped: ' &b&n✔ ᴇǫᴜɪᴘᴀᴅᴏ'
+  click-to-equip: ' &a&n✔ ᴄʟɪᴄᴋ ᴘᴀʀᴀ ᴇǫᴜɪᴘᴀʀ'
+  voucher-claimed: '%effectos_prefix%&a&l¡VOUCHER CANJEADO! &7Has desbloqueado el efecto: &e{effect}'
+  no-permission: '%effectos_prefix%&r&cNo tienes permiso para usar este efecto.'
+  effect-reset-success: '%effectos_prefix%&r&cHas removido tu efecto activo correctamente.'
+  equip-success: '%effectos_prefix%&r&7¡Equipado &f{effect}'
+  already-equipped-chat: '%effectos_prefix%&r&eYa tienes este efecto equipado actualmente.'
+  already-have-permission: '%effectos_prefix%&r&e¡Ya tienes desbloqueado este efecto!'
+  no-effect-name: '%effectos_prefix%&r&cNinguno'
+  no-effect-preview: '%effectos_prefix%&r&cSin Efecto'
+  welcome-back: '%effectos_prefix%&r&aBienvenido de nuevo. Tu efecto activo: &f{effect}'
+  reload-no-permission: '%effectos_prefix%&cNo tienes permiso para recargar la configuración.'
+  reload-success: '%effectos_prefix%&aConfiguración y efectos recargados con éxito.'
+  voucher-no-permission: '%effectos_prefix%&cNo tienes permiso para dar vouchers.'
+  voucher-usage: '%effectos_prefix%&c§lUso Incorrecto › &7/{cmd} givevoucher <jugador> <id_efecto>'
+  player-not-found: '%effectos_prefix%&cEl jugador &f{player}&c no se encuentra conectado.'
+  voucher-not-found: '%effectos_prefix%&cNo se encontró ningún voucher configurado para el efecto: &e{effect}'
+  voucher-given-sender: '%effectos_prefix%&aHas entregado 1x Voucher de &e{effect} &aa &f{player}&a.'
+  voucher-given-target: '%effectos_prefix%&a¡Has recibido un voucher para el efecto: &e{effect}&a!'
+  voucher-corrupt: '%effectos_prefix%&cEste voucher está corrupto o el efecto ya no existe en la configuración.'
 
 # ==========================================
 #         VOUCHER GLOBAL
-#    Plantilla de voucher para todos los efectos.
-#    {hex} = color hex del efecto, {name} = nombre del efecto
-#    Si un efecto tiene su propio "voucher:" en su categoría, tiene prioridad.
 # ==========================================
 global-voucher:
   material: PAPER
@@ -236,136 +346,125 @@ global-voucher:
     - ' &8&m━━━━━━━━━━━━━━━━━━━━━━━━━━━━'
 
 # ==========================================
-#    CATEGORÍAS DE EFECTOS (archivos externos)
-#    Los efectos se cargan desde: plugins/CustomEffects/categories/<nombre>.yml
-# ==========================================
-
-# ==========================================
-#         MENÚ DE FORMATOS DE TEXTO
-#    Accesible con el comando /formato
-#    Permite elegir Bold, Underline, Italic
-#    y sus combinaciones.
-# ==========================================
-# ==========================================
 #         EDITOR DE RANGOS
-#    Editor visual web para crear texturas
-#    de rangos. Accesible con /rankeditor
 # ==========================================
 rank-editor:
   enable: true
   port: 25580
-  bind-address: "0.0.0.0"
-  # Dominio o IP publica del servidor.
-  # Si pones un dominio (ej: editor.ejemplo.com), la URL usara ese dominio en vez de la IP.
-  # Si lo dejas vacio, usa la IP del server.properties.
-  public-host: ""
-  # HTTPS con certificado auto-firmado (generado automaticamente).
-  # El navegador mostrara una advertencia de certificado, pero NO mostrara "No seguro".
-  # Si usas un dominio real, puedes poner un certificado de Let's Encrypt en su lugar.
+  bind-address: 0.0.0.0
+  public-host: ''
   use-https: true
   default-canvas-width: 128
   default-canvas-height: 32
 
+# ==========================================
+#         MENÚ DE FORMATOS DE TEXTO
+# ==========================================
 format-menu:
-  title: "&8&lFORMATOS &7- &fEstilo de Texto"
+  title: '&8&lFORMATOS &7- &fEstilo de Texto'
   size: 27
   items:
     none:
-      slot: 10
+      slot: 15
       material: BARRIER
-      display: "&c&lSin Formato"
+      display: '&c&lSin Formato'
       lore:
-        - ""
-        - " &7▸ Elimina cualquier"
-        - " &7  formato de texto"
-        - ""
-        - " &e✦ Click para seleccionar"
-      style: ""
+        - ''
+        - ' &7▸ Elimina cualquier'
+        - ' &7  formato de texto'
+        - ''
+        - ' &e✦ Click para seleccionar'
+      style: ''
     bold:
+      enable: false
       slot: 11
       material: PAPER
       custom-model-data: 90010
-      display: "&l&nBold &7(Negrita)"
+      display: '&l&nBold &7(Negrita)'
       lore:
-        - ""
-        - " &7▸ Texto en &l&nnegrita"
-        - ""
-        - " &e✦ Click para seleccionar"
-      style: "bold"
+        - ''
+        - ' &7▸ Texto en &l&nnegrita'
+        - ''
+        - ' &e✦ Click para seleccionar'
+      style: bold
     underline:
+      enable: false
       slot: 12
       material: PAPER
       custom-model-data: 90011
-      display: "&nUnderline &7(Subrayado)"
+      display: '&nUnderline &7(Subrayado)'
       lore:
-        - ""
-        - " &7▸ Texto &nsubrayado"
-        - ""
-        - " &e✦ Click para seleccionar"
-      style: "underline"
+        - ''
+        - ' &7▸ Texto &nsubrayado'
+        - ''
+        - ' &e✦ Click para seleccionar'
+      style: underline
     italic:
+      enable: false
       slot: 13
       material: PAPER
       custom-model-data: 90012
-      display: "&oItalic &7(Cursiva)"
+      display: '&oItalic &7(Cursiva)'
       lore:
-        - ""
-        - " &7▸ Texto en &ocursiva"
-        - ""
-        - " &e✦ Click para seleccionar"
-      style: "italic"
+        - ''
+        - ' &7▸ Texto en &ocursiva'
+        - ''
+        - ' &e✦ Click para seleccionar'
+      style: italic
     bold_underline:
+      enable: false
       slot: 14
       material: PAPER
       custom-model-data: 90013
-      display: "&l&nBold+Underline"
+      display: '&l&nBold+Underline'
       lore:
-        - ""
-        - " &7▸ Texto en &l&nnegrita"
-        - " &7  y subrayado"
-        - ""
-        - " &e✦ Click para seleccionar"
-      style: "bold_underline"
+        - ''
+        - ' &7▸ Texto en &l&nnegrita'
+        - ' &7  y subrayado'
+        - ''
+        - ' &e✦ Click para seleccionar'
+      style: bold_underline
     bold_italic:
+      enable: false
       slot: 15
       material: PAPER
       custom-model-data: 90014
-      display: "&l&oBold+Italic"
+      display: '&l&oBold+Italic'
       lore:
-        - ""
-        - " &7▸ Texto en &l&onegrita"
-        - " &7  y cursiva"
-        - ""
-        - " &e✦ Click para seleccionar"
-      style: "bold_italic"
+        - ''
+        - ' &7▸ Texto en &l&onegrita'
+        - ' &7  y cursiva'
+        - ''
+        - ' &e✦ Click para seleccionar'
+      style: bold_italic
     underline_italic:
+      enable: false
       slot: 16
       material: PAPER
       custom-model-data: 90015
-      display: "&n&oUnderline+Italic"
+      display: '&n&oUnderline+Italic'
       lore:
-        - ""
-        - " &7▸ Texto &n&osubrayado"
-        - " &7  y cursiva"
-        - ""
-        - " &e✦ Click para seleccionar"
-      style: "underline_italic"
+        - ''
+        - ' &7▸ Texto &n&osubrayado'
+        - ' &7  y cursiva'
+        - ''
+        - ' &e✦ Click para seleccionar'
+      style: underline_italic
     bold_underline_italic:
+      enable: false
       slot: 17
       material: PAPER
       custom-model-data: 90016
-      display: "&l&n&oBold+Underline+Italic"
+      display: '&l&n&oBold+Underline+Italic'
       lore:
-        - ""
-        - " &7▸ Texto en &l&n&onegrita,"
-        - " &7  subrayado y cursiva"
-        - ""
-        - " &e✦ Click para seleccionar"
-      style: "bold_underline_italic"
-
+        - ''
+        - ' &7▸ Texto en &l&n&onegrita,'
+        - ' &7  subrayado y cursiva'
+        - ''
+        - ' &e✦ Click para seleccionar'
+      style: bold_underline_italic
   sounds:
-    select: "UI_BUTTON_CLICK"
-
+    select: UI_BUTTON_CLICK
   messages:
-    style-set: "%effectos_prefix%&aFormato cambiado a: &f{style}"
-    style-reset: "%effectos_prefix%&cFormato eliminado."
+    style-set: '%effectos_prefix%&aFormato cambiado a: &f{style}'
+    style-reset: '%effectos_prefix%&cFormato eliminado.'

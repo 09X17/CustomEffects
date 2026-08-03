@@ -144,4 +144,11 @@ public class ColorUtils {
             codes.append("&o");
         return codes.toString();
     }
+
+    @NotNull
+    public static String stripColor(@NotNull String text) {
+        if (text.isEmpty()) return text;
+        String normalized = text.replace('§', '&');
+        return normalized.replaceAll("&[0-9a-fk-or]", "").replaceAll("<[^>]+>", "");
+    }
 }

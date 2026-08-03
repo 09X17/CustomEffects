@@ -1,5 +1,5 @@
 name: CustomEffects
-version: 2.1.0
+version: 1.0.0
 main: com.customeffects.CustomEffects
 api-version: '1.21'
 author: 09X18 - AmplanNetwork
@@ -21,6 +21,11 @@ commands:
     usage: "§c¡Uso correcto! › §7/rankeditor"
     permission: effectos.rankeditor
     aliases: [reditor, rangoeditor]
+  amigo:
+    description: Sistema de amigos.
+    usage: "§c¡Uso correcto! › §7/amigo [agregar | eliminar | aceptar | rechazar | lista | menu]"
+    permission: effectos.friend
+    aliases: [friend, amigos]
 
 permissions:
   effectos.menu:
@@ -41,3 +46,12 @@ permissions:
   effectos.rankeditor:
     description: Permite abrir el editor visual de rangos.
     default: op
+  effectos.friend:
+    description: Permite usar el sistema de amigos.
+    default: true
+  effectos.category.*:
+    description: Permite ver todas las categorías del menú de efectos.
+    default: true
+  effectos.formato:
+    description: Permite usar el comando de formato.
+    default: true

@@ -2,19 +2,26 @@ package com.customeffects.utils;
 
 import java.util.UUID;
 
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
 import com.customeffects.CustomEffects;
+import com.customeffects.models.Category;
+import com.customeffects.models.Effect;
+import com.customeffects.services.DataManager;
+import com.customeffects.services.VoucherService;
 
 import me.clip.placeholderapi.PlaceholderAPI;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 
 public class PlaceholderResolver {
     private final CustomEffects plugin;
+    private final DataManager dataManager;
+    private final VoucherService voucherService;
 
     public PlaceholderResolver(CustomEffects plugin) {
         this.plugin = plugin;
+        this.dataManager = plugin.getDataManager();
+        this.voucherService = plugin.getVoucherService();
     }
 
     private String cfg(String path, String def) {
@@ -169,7 +176,7 @@ public class PlaceholderResolver {
         if (effectId == null || effectId.isEmpty()) {
             return ColorUtils.translate(cfg("messages.no-effect-name", "&cNinguno"));
         }
-        String display = plugin.getEffectDisplay(effectId);
+        String display = voucherService.getEffectDisplay(effectId);
         return ColorUtils.translate(display != null ? display : effectId);
     }
 
@@ -178,15 +185,10 @@ public class PlaceholderResolver {
             return ColorUtils.translate(cfg("messages.no-effect-preview", "&cSin Efecto"));
         }
 
-        ConfigurationSection categoriesSection = plugin.getConfig()
-                .getConfigurationSection("main-menu.categories");
-        if (categoriesSection != null) {
-            for (String category : categoriesSection.getKeys(false)) {
-                var categoryConfig = plugin.getCategoryConfig(category);
-                if (categoryConfig != null && categoryConfig.contains(effectId)) {
-                    String preview = categoryConfig.getString(effectId + ".preview", effectId);
-                    return ColorUtils.translate(preview != null ? preview : effectId);
-                }
+        for (Category category : dataManager.getAllCategories()) {
+            Effect effect = category.getEffectById(effectId);
+            if (effect != null) {
+                return ColorUtils.translate(effect.getPreview());
             }
         }
         return effectId;

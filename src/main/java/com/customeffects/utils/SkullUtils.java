@@ -6,6 +6,7 @@ import java.util.Base64;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.profile.PlayerTextures;
@@ -51,6 +52,37 @@ public class SkullUtils {
 
             } catch (MalformedURLException | IllegalArgumentException ignored) { 
             }
+        }
+    }
+
+    /**
+     * Aplica la skin del jugador a un ItemStack de tipo PLAYER_HEAD
+     * @param item ItemStack de tipo PLAYER_HEAD
+     * @param player Jugador cuya skin se aplicará
+     */
+    @SuppressWarnings("deprecation")
+    public static void applyPlayerSkin(ItemStack item, Player player) {
+        if (!(item.getItemMeta() instanceof SkullMeta skullMeta)) {
+            return;
+        }
+
+        try {
+            // Obtener el perfil del jugador
+            PlayerProfile profile = player.getPlayerProfile();
+            
+            // Verificar si el perfil tiene texturas
+            if (profile.getTextures().getSkin() == null) {
+                // Si no tiene texturas, completar el perfil
+                profile = Bukkit.createProfile(player.getUniqueId(), player.getName());
+                profile.complete();
+            }
+            
+            skullMeta.setOwnerProfile(profile);
+            item.setItemMeta(skullMeta);
+        } catch (Exception e) {
+            // Fallback: usar el nombre del jugador
+            skullMeta.setOwner(player.getName());
+            item.setItemMeta(skullMeta);
         }
     }
 }

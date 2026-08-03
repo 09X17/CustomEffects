@@ -8,7 +8,6 @@ gradientes_azules:
   hex: '#DCEBFF'
   permission: effectos.gradienteazul
   preview: '#DCEBFF¡Hola Mundo!'
-  subcategory: estaticos
 
 gradientes_amarillo:
   enable: true
@@ -20,7 +19,6 @@ gradientes_amarillo:
   hex: '#FFF6D6'
   permission: effectos.gradienteamarillo
   preview: '#FFF6D6¡Hola Mundo!'
-  subcategory: estaticos
 
 gradiente_sakura:
   enable: true
@@ -32,7 +30,6 @@ gradiente_sakura:
   hex: '#F8F8A8'
   permission: effectos.gradientesakura
   preview: '#F8F8A8¡Hola Mundo!'
-  subcategory: estaticos
 
 gradiente_dinamico_rb:
   enable: true
@@ -44,7 +41,6 @@ gradiente_dinamico_rb:
   hex: '#F8F88C'
   permission: effectos.dynamicgradientrb
   preview: '#F8F88C¡Hola Mundo!'
-  subcategory: dinamicos
 
 gradientes_carmesi:
   enable: true
@@ -56,7 +52,6 @@ gradientes_carmesi:
   hex: '#FFE0E0'
   permission: effectos.gradientecarmesi
   preview: '#FFE0E0¡Hola Mundo!'
-  subcategory: estaticos
 
 gradiente_arcano:
   enable: true
@@ -68,7 +63,6 @@ gradiente_arcano:
   hex: '#F0E6FF'
   permission: effectos.arcanerainbow
   preview: '#F0E6FF¡Hola Mundo!'
-  subcategory: estaticos
 
 gradiente_arcoiris:
   enable: true
@@ -80,7 +74,6 @@ gradiente_arcoiris:
   hex: '#F8F85C'
   permission: effectos.gradientearcoiris
   preview: '#F8F85C¡Hola Mundo!'
-  subcategory: dinamicos
 
 gradiente_dinamico_prg:
   enable: true
@@ -92,7 +85,6 @@ gradiente_dinamico_prg:
   hex: '#EBF5FF'
   permission: effectos.dynamicgradientprg
   preview: '#EBF5FF¡Hola Mundo!'
-  subcategory: dinamicos
 
 gradiente_esmeralda:
   enable: true
@@ -104,7 +96,6 @@ gradiente_esmeralda:
   hex: '#F8F8DC'
   permission: effectos.gradienteesmeralda
   preview: '#F8F8DC¡Hola Mundo!'
-  subcategory: estaticos
 
 gradiente_fuego:
   enable: true
@@ -116,7 +107,6 @@ gradiente_fuego:
   hex: '#F8F894'
   permission: effectos.gradientefuego
   preview: '#F8F894¡Hola Mundo!'
-  subcategory: estaticos
 
 aurora:
   enable: true
@@ -128,7 +118,6 @@ aurora:
   hex: '#F8F8A0'
   permission: effectos.aurora
   preview: '#F8F8A0¡Hola Mundo!'
-  subcategory: dinamicos
 
 gradiente_dinamico_gyr:
   enable: true
@@ -140,31 +129,3 @@ gradiente_dinamico_gyr:
   hex: '#B4C8FF'
   permission: effectos.dynamicgradientgyr
   preview: '#B4C8FF¡Hola Mundo!'
-  subcategory: dinamicos
-subcategories:
-  estaticos:
-    enable: true
-    material: PAPER
-    custom-model-data: 3001
-    slot: 10
-    skull-value: eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMTYzZTQ5ZDcwNDNlNTk0MDJlMDZiNWE5NWUzODVkOTRmYzMwOGY4NjkyNTQ4NWVhMDA1ZjRjYjJmZDI5OGEyMCJ9fX0=
-    display: '#DCEBFF&lGRADIENTES ESTÁTICOS'
-    lore:
-    - ''
-    - ' &7Gradientes de color'
-    - ' &7sólido y uniformes'
-    - ''
-    - ' &e✦ Click para abrir'
-  dinamicos:
-    enable: true
-    material: PAPER
-    custom-model-data: 3002
-    slot: 11
-    skull-value: eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMTYzZTQ5ZDcwNDNlNTk0MDJlMDZiNWE5NWUzODVkOTRmYzMwOGY4NjkyNTQ4NWVhMDA1ZjRjYjJmZDI5OGEyMCJ9fX0=
-    display: '#F8F85C&lGRADIENTES DINÁMICOS'
-    lore:
-    - ''
-    - ' &7Gradientes animados'
-    - ' &7y cromáticos'
-    - ''
-    - ' &e✦ Click para abrir'

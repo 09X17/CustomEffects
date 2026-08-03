@@ -1,26 +1,35 @@
-package com.customeffects;
+package com.customeffects.listeners;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Sound;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 
+import com.customeffects.CustomEffects;
+import com.customeffects.models.Category;
+import com.customeffects.models.Effect;
+import com.customeffects.services.DataManager;
+import com.customeffects.services.VoucherService;
 import com.customeffects.utils.ColorUtils;
 
 public class VoucherListener implements Listener {
-
     private final CustomEffects plugin;
+    private final DataManager dataManager;
+    private final VoucherService voucherService;
 
-    public VoucherListener(CustomEffects plugin) {
+    public VoucherListener(CustomEffects plugin, DataManager dataManager, VoucherService voucherService) {
         this.plugin = plugin;
+        this.dataManager = dataManager;
+        this.voucherService = voucherService;
     }
 
     @EventHandler
@@ -33,8 +42,13 @@ public class VoucherListener implements Listener {
                 return;
             }
 
+            ItemMeta meta = item.getItemMeta();
+            if (meta == null) {
+                return;
+            }
+
             NamespacedKey key = new NamespacedKey(plugin, "voucher_effect_id");
-            String effectId = item.getItemMeta().getPersistentDataContainer().get(key, PersistentDataType.STRING);
+            String effectId = meta.getPersistentDataContainer().get(key, PersistentDataType.STRING);
 
             if (effectId != null) {
                 event.setCancelled(true);
@@ -42,15 +56,21 @@ public class VoucherListener implements Listener {
                 String permission = findPermissionForEffect(effectId);
 
                 if (permission == null || permission.isEmpty()) {
-                    String msg = plugin.getConfig().getString("messages.voucher-corrupt", "%effectos_prefix%&cEste voucher está corrupto o el efecto ya no existe en la configuración.");
+                    String msg = plugin.getConfig().getString("messages.voucher-corrupt",
+                            "%effectos_prefix%&cEste voucher está corrupto o el efecto ya no existe en la configuración.");
                     player.sendMessage(ColorUtils.translate(resolvePrefix(msg)));
                     return;
                 }
 
                 if (player.hasPermission(permission)) {
-                    String msg = plugin.getConfig().getString("messages.already-have-permission", "%effectos_prefix%&e¡Ya tienes desbloqueado este efecto!");
+                    String msg = plugin.getConfig().getString("messages.already-have-permission",
+                            "%effectos_prefix%&e¡Ya tienes desbloqueado este efecto!");
                     player.sendMessage(ColorUtils.translate(resolvePrefix(msg)));
-                    player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_NO, 1.0F, 1.0F);
+
+                    Location loc = player.getLocation();
+                    if (loc != null) {
+                        player.playSound(loc, Sound.ENTITY_VILLAGER_NO, 1.0F, 1.0F);
+                    }
                     return;
                 }
 
@@ -63,11 +83,19 @@ public class VoucherListener implements Listener {
                 String cmd = "lp user " + player.getName() + " permission set " + permission;
                 Bukkit.dispatchCommand(Bukkit.getConsoleSender(), cmd);
 
-                String effectDisplay = plugin.getEffectDisplay(effectId);
-                String msg = plugin.getConfig().getString("messages.voucher-claimed", "%effectos_prefix%&a&l¡VOUCHER CANJEADO! &7Has desbloqueado el efecto: &e{effect}");
+                String effectDisplay = voucherService.getEffectDisplay(effectId);
+                String msg = plugin.getConfig().getString("messages.voucher-claimed",
+                        "%effectos_prefix%&a&l¡VOUCHER CANJEADO! &7Has desbloqueado el efecto: &e{effect}");
+                if (msg == null) {
+                    msg = "%effectos_prefix%&a&l¡VOUCHER CANJEADO! &7Has desbloqueado el efecto: &e{effect}";
+                }
                 msg = msg.replace("{effect}", effectDisplay);
                 player.sendMessage(ColorUtils.translate(resolvePrefix(msg)));
-                player.playSound(player.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, 1.0F, 1.0F);
+
+                Location loc = player.getLocation();
+                if (loc != null) {
+                    player.playSound(loc, Sound.UI_TOAST_CHALLENGE_COMPLETE, 1.0F, 1.0F);
+                }
             }
         }
     }
@@ -78,11 +106,10 @@ public class VoucherListener implements Listener {
     }
 
     private String findPermissionForEffect(String effectId) {
-        java.util.Set<String> categories = plugin.getConfig().getConfigurationSection("main-menu.categories").getKeys(false);
-        for (String categoryKey : categories) {
-            YamlConfiguration categoryConfig = plugin.getCategoryConfig(categoryKey);
-            if (categoryConfig != null && categoryConfig.contains(effectId)) {
-                return categoryConfig.getString(effectId + ".permission", "");
+        for (Category category : dataManager.getAllCategories()) {
+            Effect effect = category.getEffectById(effectId);
+            if (effect != null) {
+                return effect.getPermission();
             }
         }
         return null;

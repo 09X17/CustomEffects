@@ -1,0 +1,12 @@
+# Friends Menu - Este archivo es requerido por el sistema de categorías
+# El menú de amigos se abre directamente desde FriendMenuService
+# No necesita efectos aquí
+
+_friends_placeholder:
+  enable: false
+  material: PAPER
+  display: " "
+  hex: "#FFFFFF"
+  permission: ""
+  preview: " "
+  lore: []
