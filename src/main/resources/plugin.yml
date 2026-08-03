@@ -16,6 +16,11 @@ commands:
     usage: "§c¡Uso correcto! › §7/formato"
     permission: effectos.style
     aliases: [style, formatos]
+  rankeditor:
+    description: Abre el editor visual de rangos en el navegador.
+    usage: "§c¡Uso correcto! › §7/rankeditor"
+    permission: effectos.rankeditor
+    aliases: [reditor, rangoeditor]
 
 permissions:
   effectos.menu:
@@ -33,3 +38,6 @@ permissions:
   effectos.style:
     description: Permite abrir el menú de formatos de texto.
     default: true
+  effectos.rankeditor:
+    description: Permite abrir el editor visual de rangos.
+    default: op

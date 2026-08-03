@@ -1,13 +1,9 @@
 package com.customeffects;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -19,9 +15,12 @@ import java.util.logging.Logger;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.customeffects.database.DatabaseManager;
+import com.customeffects.editor.RankEditorCommand;
+import com.customeffects.editor.WebEditorServer;
 import com.customeffects.placeholder.EffectosExpansion;
 import com.customeffects.utils.ColorUtils;
 
@@ -36,6 +35,8 @@ public final class CustomEffects extends JavaPlugin {
     private final Map<String, List<String>> categorySubcategories = new HashMap<>();
     private final Map<String, Map<String, Map<String, String>>> subcategoryData = new HashMap<>();
     private final Map<String, Map<String, List<String>>> subcategoryEffects = new HashMap<>();
+    private final List<String> prefixCategories = new ArrayList<>();
+    private WebEditorServer webEditorServer;
 
     public CustomEffects() {
     }
@@ -50,6 +51,7 @@ public final class CustomEffects extends JavaPlugin {
         this.saveDefaultConfig();
         this.saveCategoryFiles();
         this.updateConfigCommentsSafe();
+        this.updateCategoryFiles();
         this.loadPluginData();
 
         this.database = new DatabaseManager();
@@ -76,6 +78,23 @@ public final class CustomEffects extends JavaPlugin {
             this.getLogger().severe("El comando 'formato' no está registrado en plugin.yml");
         }
 
+        RankEditorCommand rankEditorCommand = new RankEditorCommand(this);
+        var rankEditorCmd = this.getCommand("rankeditor");
+        if (rankEditorCmd != null) {
+            rankEditorCmd.setExecutor(rankEditorCommand);
+            rankEditorCmd.setTabCompleter(rankEditorCommand);
+        } else {
+            this.getLogger().severe("El comando 'rankeditor' no está registrado en plugin.yml");
+        }
+
+        if (this.getConfig().getBoolean("rank-editor.enable", true)) {
+            int port = this.getConfig().getInt("rank-editor.port", 25580);
+            String bind = this.getConfig().getString("rank-editor.bind-address", "0.0.0.0");
+            boolean https = this.getConfig().getBoolean("rank-editor.use-https", true);
+            this.webEditorServer = new WebEditorServer(this);
+            this.webEditorServer.start(port, bind, https);
+        }
+
         if (this.getServer().getPluginManager().isPluginEnabled("PlaceholderAPI")) {
             new EffectosExpansion(this).register();
             this.getLogger().info("PlaceholderAPI conectado correctamente.");
@@ -88,6 +107,9 @@ public final class CustomEffects extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        if (this.webEditorServer != null) {
+            this.webEditorServer.stop();
+        }
         if (this.database != null) {
             this.database.close();
         }
@@ -97,88 +119,44 @@ public final class CustomEffects extends JavaPlugin {
     private void updateConfigCommentsSafe() {
         try {
             File configFile = new File(this.getDataFolder(), "config.yml");
-            if (!configFile.exists()) return;
+            if (!configFile.exists())
+                return;
 
-            FileConfiguration userConfig = this.getConfig();
-
-            InputStream jarResourceStream = this.getResource("config.yml");
-            if (jarResourceStream == null) {
+            InputStream jarStream = this.getResource("config.yml");
+            if (jarStream == null) {
                 this.getLogger().warning("No se encontró config.yml en el jar.");
                 return;
             }
 
-            try (InputStreamReader jarReader = new InputStreamReader(jarResourceStream, StandardCharsets.UTF_8)) {
-                YamlConfiguration jarConfig = YamlConfiguration.loadConfiguration(jarReader);
-
-                boolean necesitaActualizacion = false;
-                for (String key : jarConfig.getKeys(true)) {
-                    if (!userConfig.contains(key)) {
-                        necesitaActualizacion = true;
-                        break;
-                    }
-                }
-
-                if (!necesitaActualizacion) return;
-
-                this.getLogger().info("Detectadas nuevas opciones en la actualización. Inyectando sin alterar comentarios...");
-
-                InputStream readerStream = this.getResource("config.yml");
-                if (readerStream == null) {
-                    this.getLogger().warning("No se pudo releer config.yml del jar.");
-                    return;
-                }
-
-                try (BufferedReader reader = new BufferedReader(
-                        new InputStreamReader(readerStream, StandardCharsets.UTF_8));
-                     BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(
-                             new FileOutputStream(configFile, true), StandardCharsets.UTF_8))) {
-
-                    String line;
-                    String currentSection = "";
-                    boolean escribiendoNuevaSeccion = false;
-
-                    writer.newLine();
-                    writer.write("# =========================================================");
-                    writer.newLine();
-                    writer.write("# NUEVAS OPCIONES AÑADIDAS AUTOMÁTICAMENTE EN LA ACTUALIZACIÓN");
-                    writer.newLine();
-                    writer.write("# =========================================================");
-                    writer.newLine();
-
-                    while ((line = reader.readLine()) != null) {
-                        String trimmed = line.trim();
-
-                        if (trimmed.startsWith("#") || trimmed.isEmpty()) {
-                            if (escribiendoNuevaSeccion) {
-                                writer.write(line);
-                                writer.newLine();
-                            }
-                            continue;
-                        }
-
-                        if (line.matches("^[a-zA-Z_-]+:.*")) {
-                            currentSection = line.split(":")[0];
-                            escribiendoNuevaSeccion = !userConfig.contains(currentSection);
-                        } else if (trimmed.contains(":") && !escribiendoNuevaSeccion) {
-                            String fullPath = currentSection + "." + trimmed.split(":")[0];
-                            if (userConfig.contains(fullPath)) {
-                                escribiendoNuevaSeccion = false;
-                            } else {
-                                String buildPath = line.contains(":") ? line.split(":")[0].trim() : "";
-                                escribiendoNuevaSeccion = !userConfig.contains(buildPath);
-                            }
-                        }
-
-                        if (escribiendoNuevaSeccion) {
-                            writer.write(line);
-                            writer.newLine();
-                        }
-                    }
-                }
-
-                this.reloadConfig();
-                this.getLogger().info("¡Archivo config.yml actualizado con éxito!");
+            YamlConfiguration jarConfig;
+            try (InputStreamReader reader = new InputStreamReader(jarStream, StandardCharsets.UTF_8)) {
+                jarConfig = YamlConfiguration.loadConfiguration(reader);
             }
+
+            YamlConfiguration userConfig = YamlConfiguration.loadConfiguration(configFile);
+
+            List<String> missingKeys = new ArrayList<>();
+            for (String key : jarConfig.getKeys(true)) {
+                if (!userConfig.contains(key)) {
+                    missingKeys.add(key);
+                }
+            }
+
+            if (missingKeys.isEmpty())
+                return;
+
+            this.getLogger().info("Detectadas " + missingKeys.size()
+                    + " nuevas opciones. Inyectando en config.yml...");
+
+            for (String key : missingKeys) {
+                Object jarValue = jarConfig.get(key);
+                userConfig.set(key, jarValue);
+            }
+
+            userConfig.save(configFile);
+            this.reloadConfig();
+
+            this.getLogger().info("¡config.yml actualizado con " + missingKeys.size() + " nuevas claves!");
         } catch (IOException e) {
             this.getLogger().log(Level.SEVERE, "Error al actualizar config.yml: {0}", e.getMessage());
         }
@@ -190,6 +168,7 @@ public final class CustomEffects extends JavaPlugin {
         this.categorySubcategories.clear();
         this.subcategoryData.clear();
         this.subcategoryEffects.clear();
+        this.prefixCategories.clear();
 
         this.mainMenuTitle = ColorUtils.translate(cfg("main-menu.title", "&8Categorías de Efectos"));
         this.mainMenuSize = this.getConfig().getInt("main-menu.size", 27);
@@ -207,6 +186,11 @@ public final class CustomEffects extends JavaPlugin {
         File categoriesFolder = new File(this.getDataFolder(), "categories");
 
         for (String categoryKey : categoriesSection.getKeys(false)) {
+            String categoryType = cfg("main-menu.categories." + categoryKey + ".type", "effect");
+            if ("prefix".equals(categoryType)) {
+                prefixCategories.add(categoryKey);
+            }
+
             File categoryFile = new File(categoriesFolder, categoryKey + ".yml");
             if (!categoryFile.exists()) {
                 this.getLogger().log(Level.WARNING,
@@ -226,18 +210,21 @@ public final class CustomEffects extends JavaPlugin {
 
             if (subcatsSection != null) {
                 for (String subcatKey : subcatsSection.getKeys(false)) {
-                    if (!subcatsSection.isConfigurationSection(subcatKey)) continue;
-                    if (!subcatsSection.getBoolean(subcatKey + ".enable", true)) continue;
+                    if (!subcatsSection.isConfigurationSection(subcatKey))
+                        continue;
+                    if (!subcatsSection.getBoolean(subcatKey + ".enable", true))
+                        continue;
 
                     subcategoryKeys.add(subcatKey);
                     totalSubcategorias++;
 
                     Map<String, String> subcatInfo = new HashMap<>();
-                    subcatInfo.put("display",          cfgSection(subcatsSection, subcatKey + ".display", subcatKey));
-                    subcatInfo.put("material",          cfgSection(subcatsSection, subcatKey + ".material", "PAPER"));
-                    subcatInfo.put("custom-model-data", cfgSection(subcatsSection, subcatKey + ".custom-model-data", ""));
-                    subcatInfo.put("slot",              cfgSection(subcatsSection, subcatKey + ".slot", ""));
-                    subcatInfo.put("skull-value",       cfgSection(subcatsSection, subcatKey + ".skull-value", ""));
+                    subcatInfo.put("display", cfgSection(subcatsSection, subcatKey + ".display", subcatKey));
+                    subcatInfo.put("material", cfgSection(subcatsSection, subcatKey + ".material", "PAPER"));
+                    subcatInfo.put("custom-model-data",
+                            cfgSection(subcatsSection, subcatKey + ".custom-model-data", ""));
+                    subcatInfo.put("slot", cfgSection(subcatsSection, subcatKey + ".slot", ""));
+                    subcatInfo.put("skull-value", cfgSection(subcatsSection, subcatKey + ".skull-value", ""));
                     subcatDataMap.put(subcatKey, subcatInfo);
                     subcatEffectsMap.put(subcatKey, new ArrayList<>());
                 }
@@ -245,20 +232,24 @@ public final class CustomEffects extends JavaPlugin {
 
             // Parse effects
             for (String effectKey : categoryConfig.getKeys(false)) {
-                if (effectKey.equals("subcategories")) continue;
-                if (!categoryConfig.isConfigurationSection(effectKey)) continue;
-                if (!categoryConfig.getBoolean(effectKey + ".enable", true)) continue;
+                if (effectKey.equals("subcategories"))
+                    continue;
+                if (!categoryConfig.isConfigurationSection(effectKey))
+                    continue;
+                if (!categoryConfig.getBoolean(effectKey + ".enable", true))
+                    continue;
 
                 Map<String, String> effectInfo = new HashMap<>();
-                effectInfo.put("display",          cfgSection(categoryConfig, effectKey + ".display", effectKey));
-                effectInfo.put("hex",               cfgSection(categoryConfig, effectKey + ".hex", "#FFFFFF"));
-                effectInfo.put("permission",        cfgSection(categoryConfig, effectKey + ".permission", ""));
-                effectInfo.put("preview",           cfgSection(categoryConfig, effectKey + ".preview", effectKey));
-                effectInfo.put("material",          cfgSection(categoryConfig, effectKey + ".material", "PAPER"));
+                effectInfo.put("display", cfgSection(categoryConfig, effectKey + ".display", effectKey));
+                effectInfo.put("hex", cfgSection(categoryConfig, effectKey + ".hex", "#FFFFFF"));
+                effectInfo.put("permission", cfgSection(categoryConfig, effectKey + ".permission", ""));
+                effectInfo.put("preview", cfgSection(categoryConfig, effectKey + ".preview", effectKey));
+                effectInfo.put("material", cfgSection(categoryConfig, effectKey + ".material", "PAPER"));
                 effectInfo.put("custom-model-data", cfgSection(categoryConfig, effectKey + ".custom-model-data", ""));
-                effectInfo.put("slot",              cfgSection(categoryConfig, effectKey + ".slot", ""));
-                effectInfo.put("skull-value",       cfgSection(categoryConfig, effectKey + ".skull-value", ""));
-                effectInfo.put("has-custom-lore",   categoryConfig.contains(effectKey + ".lore") ? "true" : "false");
+                effectInfo.put("slot", cfgSection(categoryConfig, effectKey + ".slot", ""));
+                effectInfo.put("skull-value", cfgSection(categoryConfig, effectKey + ".skull-value", ""));
+                effectInfo.put("group", cfgSection(categoryConfig, effectKey + ".group", "all"));
+                effectInfo.put("has-custom-lore", categoryConfig.contains(effectKey + ".lore") ? "true" : "false");
 
                 String subcategory = categoryConfig.getString(effectKey + ".subcategory", "");
                 if (subcategory != null && !subcategory.isEmpty() && subcatEffectsMap.containsKey(subcategory)) {
@@ -281,20 +272,65 @@ public final class CustomEffects extends JavaPlugin {
         Logger logger = this.getLogger();
         logger.log(Level.INFO,
                 "Se han indexado {0} categorías, {2} subcategorías y un total de {1} efectos.",
-                new Object[]{ this.categoryEffects.size(), totalEfectos, totalSubcategorias });
+                new Object[] { this.categoryEffects.size(), totalEfectos, totalSubcategorias });
     }
 
     private void saveCategoryFiles() {
         File categoriesFolder = new File(this.getDataFolder(), "categories");
-        if (!categoriesFolder.exists() && !categoriesFolder.mkdirs()) { 
+        if (!categoriesFolder.exists() && !categoriesFolder.mkdirs()) {
             this.getLogger().severe("No se pudo crear la carpeta 'categories'.");
             return;
         }
 
-        for (String fileName : new String[]{ "rainbows.yml", "basic_colors.yml", "mechanics.yml" }) {
+        for (String fileName : new String[] { "rainbows.yml", "basic_colors.yml", "mechanics.yml", "prefixes.yml" }) {
             File file = new File(categoriesFolder, fileName);
             if (!file.exists()) {
                 this.saveResource("categories/" + fileName, false);
+            }
+        }
+    }
+
+    private void updateCategoryFiles() {
+        File categoriesFolder = new File(this.getDataFolder(), "categories");
+        if (!categoriesFolder.exists())
+            return;
+
+        for (String fileName : new String[] { "rainbows.yml", "basic_colors.yml", "mechanics.yml", "prefixes.yml" }) {
+            try {
+                File userFile = new File(categoriesFolder, fileName);
+                if (!userFile.exists())
+                    continue;
+
+                InputStream jarStream = this.getResource("categories/" + fileName);
+                if (jarStream == null)
+                    continue;
+
+                YamlConfiguration jarConfig;
+                try (InputStreamReader reader = new InputStreamReader(jarStream, StandardCharsets.UTF_8)) {
+                    jarConfig = YamlConfiguration.loadConfiguration(reader);
+                }
+
+                YamlConfiguration userConfig = YamlConfiguration.loadConfiguration(userFile);
+
+                List<String> missingKeys = new ArrayList<>();
+                for (String key : jarConfig.getKeys(true)) {
+                    if (!userConfig.contains(key)) {
+                        missingKeys.add(key);
+                    }
+                }
+
+                if (missingKeys.isEmpty())
+                    continue;
+
+                for (String key : missingKeys) {
+                    userConfig.set(key, jarConfig.get(key));
+                }
+
+                userConfig.save(userFile);
+                this.getLogger().info("Actualizado categories/" + fileName + " con " + missingKeys.size() + " nuevas claves.");
+            } catch (IOException e) {
+                this.getLogger().log(Level.WARNING, "Error al actualizar categories/{0}: {1}",
+                        new Object[] { fileName, e.getMessage() });
             }
         }
     }
@@ -386,7 +422,78 @@ public final class CustomEffects extends JavaPlugin {
         return null;
     }
 
+    public boolean isPrefixCategory(String category) {
+        return this.prefixCategories.contains(category);
+    }
+
+    public String getPrefixValue(String prefixId, String category) {
+        YamlConfiguration categoryConfig = getCategoryConfig(category);
+        if (categoryConfig != null) {
+            return categoryConfig.getString(prefixId + ".prefix", "");
+        }
+        return "";
+    }
+
     public List<String> getDefaultLore() {
         return this.getConfig().getStringList("default-lore");
+    }
+
+    public WebEditorServer getWebEditorServer() {
+        return this.webEditorServer;
+    }
+
+    public String getLuckPermsPrefix(Player player) {
+        try {
+            if (this.getServer().getPluginManager().getPlugin("LuckPerms") == null) {
+                return "";
+            }
+            net.luckperms.api.LuckPerms luckPerms = net.luckperms.api.LuckPermsProvider.get();
+            net.luckperms.api.model.user.User user = luckPerms.getUserManager().getUser(player.getUniqueId());
+            if (user == null)
+                return "";
+
+            String prefixRaw = user.getCachedData().getMetaData().getPrefix();
+
+            return prefixRaw != null && !prefixRaw.isEmpty()
+                    ? ColorUtils.translate(prefixRaw)
+                    : "";
+        } catch (Exception ignored) {
+        }
+        return "";
+    }
+
+    public String getPlayerGroup(Player player) {
+        try {
+            if (this.getServer().getPluginManager().getPlugin("LuckPerms") == null) {
+                return "default";
+            }
+            net.luckperms.api.LuckPerms luckPerms = net.luckperms.api.LuckPermsProvider.get();
+            net.luckperms.api.model.user.User user = luckPerms.getUserManager().getUser(player.getUniqueId());
+            if (user == null) return "default";
+            String primaryGroup = user.getPrimaryGroup();
+            return primaryGroup != null ? primaryGroup : "default";
+        } catch (Exception e) {
+            return "default";
+        }
+    }
+
+    public boolean canPlayerSeePrefix(Player player, String prefixGroup) {
+        if (prefixGroup == null || prefixGroup.isEmpty() || "all".equals(prefixGroup)) {
+            return true;
+        }
+        String playerGroup = getPlayerGroup(player);
+        if ("owner".equals(playerGroup)) {
+            return true;
+        }
+        List<String> hierarchy = this.getConfig().getStringList("prefix-system.rank-hierarchy");
+        if (hierarchy.isEmpty()) {
+            hierarchy = List.of("default", "nova", "nexus", "void", "mod", "admin", "owner");
+        }
+        int playerIndex = hierarchy.indexOf(playerGroup);
+        int prefixIndex = hierarchy.indexOf(prefixGroup);
+        if (playerIndex == -1 || prefixIndex == -1) {
+            return playerGroup.equals(prefixGroup);
+        }
+        return playerIndex >= prefixIndex;
     }
 }

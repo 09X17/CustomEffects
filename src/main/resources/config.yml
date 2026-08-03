@@ -81,10 +81,41 @@ main-menu:
         - " &f▸ &7ɢɪʀᴏs ʏ ᴅɪsᴛᴏʀsɪᴏɴᴇs."
         - ""
         - " &e✦&n ᴄʟɪᴄ ᴘᴀʀᴀ ᴀʙʀɪʀ"
+    prefixes:
+      enable: true
+      type: prefix
+      slot: 16
+      material: PAPER
+      custom-model-data: 90008
+      display: "#FFAA00&nᴘʀᴇꜰɪᴊᴏs ᴅᴇ ʀᴀɴɢᴏ"
+      lore:
+        - " "
+        - " &6✴&n ᴅᴇsᴄʀɪᴘᴄɪóɴ:"
+        - " &f▸ &7ᴄᴀᴍʙɪᴀ ᴛᴜ ᴘʀᴇꜰɪᴊᴏ"
+        - " &f▸ &7sᴇɢúɴ ᴛᴜ ʀᴀɴɢᴏ"
+        - " &f▸ &7ʏ ᴇsᴛɪʟᴏ ᴘᴇʀsᴏɴᴀʟ."
+        - ""
+        - " &e✦&n ᴄʟɪᴄ ᴘᴀʀᴀ ᴀʙʀɪʀ"
 
 subcategory-menu:
   size: 54
   effects-per-page: 45
+
+# ==========================================
+#         SISTEMA DE PREFIJOS
+#    Al reiniciar el prefijo, se restaura
+#    el prefijo por defecto de LuckPerms.
+# ==========================================
+prefix-system:
+  use-luckperms-default: true
+  rank-hierarchy:
+    - "default"
+    - "nova"
+    - "nexus"
+    - "void"
+    - "mod"
+    - "admin"
+    - "owner"
 
 # ==========================================
 #          BOTONES DE NAVEGACIÓN
@@ -215,6 +246,26 @@ global-voucher:
 #    Permite elegir Bold, Underline, Italic
 #    y sus combinaciones.
 # ==========================================
+# ==========================================
+#         EDITOR DE RANGOS
+#    Editor visual web para crear texturas
+#    de rangos. Accesible con /rankeditor
+# ==========================================
+rank-editor:
+  enable: true
+  port: 25580
+  bind-address: "0.0.0.0"
+  # Dominio o IP publica del servidor.
+  # Si pones un dominio (ej: editor.ejemplo.com), la URL usara ese dominio en vez de la IP.
+  # Si lo dejas vacio, usa la IP del server.properties.
+  public-host: ""
+  # HTTPS con certificado auto-firmado (generado automaticamente).
+  # El navegador mostrara una advertencia de certificado, pero NO mostrara "No seguro".
+  # Si usas un dominio real, puedes poner un certificado de Let's Encrypt en su lugar.
+  use-https: true
+  default-canvas-width: 128
+  default-canvas-height: 32
+
 format-menu:
   title: "&8&lFORMATOS &7- &fEstilo de Texto"
   size: 27

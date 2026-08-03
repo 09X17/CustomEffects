@@ -39,16 +39,19 @@ public class EffectosExpansion extends PlaceholderExpansion {
 
     @Override
     public String onPlaceholderRequest(Player player, @NotNull String params) {
-        if (player == null) return "";
+        if (player == null)
+            return "";
 
         UUID uuid = player.getUniqueId();
-        if (this.plugin.getDatabase().getActiveEffect(uuid) == null) {
+        if (this.plugin.getDatabase().getActiveEffect(uuid) == null
+                && this.plugin.getDatabase().getPrefix(uuid) == null) {
             this.plugin.getDatabase().loadPlayerData(uuid);
         }
 
         String effectId = this.plugin.getDatabase().getActiveEffect(uuid);
         String hex = this.plugin.getDatabase().getHex(uuid);
         String style = this.plugin.getDatabase().getStyle(uuid);
+        String prefix = this.plugin.getDatabase().getPrefix(uuid);
 
         switch (params.toLowerCase()) {
             case "hex":
@@ -57,6 +60,19 @@ public class EffectosExpansion extends PlaceholderExpansion {
                 return effectId != null && !effectId.isEmpty() ? effectId : "NONE";
             case "has_effect":
                 return effectId != null && !effectId.isEmpty() ? "true" : "false";
+            case "prefix":
+                if (prefix != null && !prefix.isEmpty()) {
+                    return ColorUtils.translate(prefix);
+                }
+                // Si no hay prefix custom, obtener de LuckPerms
+                return getLuckPermsPrefix(player);
+            case "has_prefix":
+                if (prefix != null && !prefix.isEmpty()) {
+                    return "true";
+                }
+                // Verificar si tiene prefix en LuckPerms
+                String luckPermsPrefix = getLuckPermsPrefix(player);
+                return luckPermsPrefix != null && !luckPermsPrefix.isEmpty() ? "true" : "false";
             case "format":
                 String s1 = ColorUtils.styleToLegacy(style != null ? style : "");
                 return hex != null && !hex.isEmpty()
@@ -72,7 +88,8 @@ public class EffectosExpansion extends PlaceholderExpansion {
                 }
                 return ColorUtils.applyStyle("<white>" + player.getName(), style != null ? style : "");
             case "style":
-                if (style == null || style.isEmpty()) return "Sin Formato";
+                if (style == null || style.isEmpty())
+                    return "Sin Formato";
                 return switch (style) {
                     case "bold" -> "Bold";
                     case "underline" -> "Underline";
@@ -86,7 +103,8 @@ public class EffectosExpansion extends PlaceholderExpansion {
             case "style_code":
                 return ColorUtils.styleToLegacy(style != null ? style : "");
             case "name":
-                if (effectId == null || effectId.isEmpty()) return "Ninguno";
+                if (effectId == null || effectId.isEmpty())
+                    return "Ninguno";
                 return ColorUtils.translate(this.plugin.getEffectDisplay(effectId));
             case "preview":
                 return getEffectPreview(effectId);
@@ -122,5 +140,33 @@ public class EffectosExpansion extends PlaceholderExpansion {
             }
         }
         return effectId;
+    }
+
+    private String getLuckPermsPrefix(Player player) {
+        try {
+            if (this.plugin.getServer().getPluginManager().getPlugin("LuckPerms") == null) {
+                this.plugin.getLogger().warning("[DEBUG] LuckPerms no está instalado");
+                return "";
+            }
+
+            net.luckperms.api.LuckPerms luckPerms = net.luckperms.api.LuckPermsProvider.get();
+            net.luckperms.api.model.user.User user = luckPerms.getUserManager().getUser(player.getUniqueId());
+            if (user == null) {
+                return "";
+            }
+
+            // Obtener el prefix del grupo/rango actual (heredado)
+            String prefixRaw = user.getCachedData().getMetaData().getPrefix();
+
+            if (prefixRaw != null && !prefixRaw.isEmpty()) {
+                String translatedValue = ColorUtils.translate(prefixRaw);
+                return translatedValue;
+            } else {
+            }
+        } catch (Exception e) {
+            this.plugin.getLogger().warning("Error al obtener prefix de LuckPerms: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return "";
     }
 }

@@ -63,13 +63,17 @@ public class DatabaseManager {
         String sql = useMySQL 
             ? "CREATE TABLE IF NOT EXISTS " + tablePrefix + "player_effects (" +
               "uuid VARCHAR(36) PRIMARY KEY, effect_id TEXT NOT NULL, hex VARCHAR(10) NOT NULL, " +
-              "style VARCHAR(50) DEFAULT '', last_used BIGINT DEFAULT 0) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;"
+              "style VARCHAR(50) DEFAULT '', prefix VARCHAR(100) DEFAULT '', last_used BIGINT DEFAULT 0) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;"
             : "CREATE TABLE IF NOT EXISTS player_effects (" +
               "uuid TEXT PRIMARY KEY, effect_id TEXT NOT NULL, hex TEXT NOT NULL, " +
-              "style TEXT DEFAULT '', last_used BIGINT DEFAULT 0);";
+              "style TEXT DEFAULT '', prefix TEXT DEFAULT '', last_used BIGINT DEFAULT 0);";
         
         try (Connection conn = dataSource.getConnection(); Statement stmt = conn.createStatement()) {
             stmt.execute(sql);
+            try {
+                stmt.execute("ALTER TABLE " + getTableName() + " ADD COLUMN prefix " + 
+                    (useMySQL ? "VARCHAR(100) DEFAULT ''" : "TEXT DEFAULT ''"));
+            } catch (SQLException ignored) {}
         } catch (SQLException e) {
             logger.log(Level.SEVERE, "Error configurando tablas", e);
         }
@@ -80,22 +84,43 @@ public class DatabaseManager {
     }
 
     public void loadPlayerData(UUID uuid) {
-        String sql = "SELECT effect_id, hex, style, last_used FROM " + getTableName() + " WHERE uuid=?";
-        try (Connection conn = dataSource.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, uuid.toString());
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    cache.put(uuid, new PlayerData(rs.getString("effect_id"), rs.getString("hex"), rs.getString("style"), rs.getLong("last_used")));
-                } else {
-                    String insertSql = "INSERT INTO " + getTableName() + " (uuid, effect_id, hex, style, last_used) VALUES(?,?,?,?,?)";
-                    try (PreparedStatement insertStmt = conn.prepareStatement(insertSql)) {
-                        insertStmt.setString(1, uuid.toString());
-                        insertStmt.setString(2, "");
-                        insertStmt.setString(3, "#FFFFFF");
-                        insertStmt.setString(4, "");
-                        insertStmt.setLong(5, System.currentTimeMillis());
-                        insertStmt.executeUpdate();
-                        cache.put(uuid, new PlayerData("", "#FFFFFF", "", System.currentTimeMillis()));
+        try (Connection conn = dataSource.getConnection()) {
+            boolean hasPrefix = false;
+            try (ResultSet rs = conn.getMetaData().getColumns(null, null, getTableName(), "prefix")) {
+                hasPrefix = rs.next();
+            }
+
+            String sql = hasPrefix
+                ? "SELECT effect_id, hex, style, prefix, last_used FROM " + getTableName() + " WHERE uuid=?"
+                : "SELECT effect_id, hex, style, last_used FROM " + getTableName() + " WHERE uuid=?";
+
+            try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+                stmt.setString(1, uuid.toString());
+                try (ResultSet rs = stmt.executeQuery()) {
+                    if (rs.next()) {
+                        String effectId = rs.getString("effect_id");
+                        String hex = rs.getString("hex");
+                        String style = rs.getString("style");
+                        String prefix = hasPrefix ? rs.getString("prefix") : "";
+                        long lastUsed = rs.getLong("last_used");
+                        cache.put(uuid, new PlayerData(
+                            effectId != null ? effectId : "",
+                            hex != null ? hex : "#FFFFFF",
+                            style != null ? style : "",
+                            prefix != null ? prefix : "",
+                            lastUsed));
+                    } else {
+                        String insertSql = "INSERT INTO " + getTableName() + " (uuid, effect_id, hex, style, prefix, last_used) VALUES(?,?,?,?,?,?)";
+                        try (PreparedStatement insertStmt = conn.prepareStatement(insertSql)) {
+                            insertStmt.setString(1, uuid.toString());
+                            insertStmt.setString(2, "");
+                            insertStmt.setString(3, "#FFFFFF");
+                            insertStmt.setString(4, "");
+                            insertStmt.setString(5, "");
+                            insertStmt.setLong(6, System.currentTimeMillis());
+                            insertStmt.executeUpdate();
+                            cache.put(uuid, new PlayerData("", "#FFFFFF", "", "", System.currentTimeMillis()));
+                        }
                     }
                 }
             }
@@ -105,18 +130,20 @@ public class DatabaseManager {
     }
 
     public void saveEffect(UUID uuid, String effect, String hex, String style) {
-        cache.put(uuid, new PlayerData(effect, hex, style != null ? style : "", System.currentTimeMillis()));
+        String prefix = getPrefix(uuid);
+        cache.put(uuid, new PlayerData(effect, hex, style != null ? style : "", prefix != null ? prefix : "", System.currentTimeMillis()));
         
         String sql = useMySQL 
-            ? "INSERT INTO " + getTableName() + " (uuid, effect_id, hex, style, last_used) VALUES(?,?,?,?,?) ON DUPLICATE KEY UPDATE effect_id=VALUES(effect_id), hex=VALUES(hex), style=VALUES(style), last_used=VALUES(last_used)"
-            : "INSERT OR REPLACE INTO " + getTableName() + " (uuid, effect_id, hex, style, last_used) VALUES(?,?,?,?,?)";
+            ? "INSERT INTO " + getTableName() + " (uuid, effect_id, hex, style, prefix, last_used) VALUES(?,?,?,?,?,?) ON DUPLICATE KEY UPDATE effect_id=VALUES(effect_id), hex=VALUES(hex), style=VALUES(style), prefix=VALUES(prefix), last_used=VALUES(last_used)"
+            : "INSERT OR REPLACE INTO " + getTableName() + " (uuid, effect_id, hex, style, prefix, last_used) VALUES(?,?,?,?,?,?)";
 
         try (Connection conn = dataSource.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, uuid.toString());
             stmt.setString(2, effect);
             stmt.setString(3, hex);
             stmt.setString(4, style != null ? style : "");
-            stmt.setLong(5, System.currentTimeMillis());
+            stmt.setString(5, prefix != null ? prefix : "");
+            stmt.setLong(6, System.currentTimeMillis());
             stmt.executeUpdate();
         } catch (SQLException e) {
             logger.log(Level.WARNING, "Error al guardar efecto para " + uuid, e);
@@ -158,6 +185,35 @@ public class DatabaseManager {
         saveEffect(uuid, (data != null) ? data.effectId() : "", (data != null) ? data.hex() : "#FFFFFF", style);
     }
 
+    public String getPrefix(UUID uuid) {
+        PlayerData data = cache.get(uuid);
+        return (data != null && data.prefix() != null) ? data.prefix() : "";
+    }
+
+    public void savePrefix(UUID uuid, String prefix) {
+        PlayerData data = cache.get(uuid);
+        String effectId = (data != null) ? data.effectId() : "";
+        String hex = (data != null) ? data.hex() : "#FFFFFF";
+        String style = (data != null) ? data.style() : "";
+        cache.put(uuid, new PlayerData(effectId, hex, style, prefix != null ? prefix : "", System.currentTimeMillis()));
+        
+        String sql = useMySQL 
+            ? "INSERT INTO " + getTableName() + " (uuid, effect_id, hex, style, prefix, last_used) VALUES(?,?,?,?,?,?) ON DUPLICATE KEY UPDATE prefix=VALUES(prefix), last_used=VALUES(last_used)"
+            : "INSERT OR REPLACE INTO " + getTableName() + " (uuid, effect_id, hex, style, prefix, last_used) VALUES(?,?,?,?,?,?)";
+
+        try (Connection conn = dataSource.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, uuid.toString());
+            stmt.setString(2, effectId);
+            stmt.setString(3, hex);
+            stmt.setString(4, style);
+            stmt.setString(5, prefix != null ? prefix : "");
+            stmt.setLong(6, System.currentTimeMillis());
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            logger.log(Level.WARNING, "Error al guardar prefijo para " + uuid, e);
+        }
+    }
+
     public void unloadPlayerData(UUID uuid) {
         cache.remove(uuid);
     }
@@ -173,5 +229,5 @@ public class DatabaseManager {
         return useMySQL;
     }
 
-    public record PlayerData(String effectId, String hex, String style, long lastUsed) {}
+    public record PlayerData(String effectId, String hex, String style, String prefix, long lastUsed) {}
 }

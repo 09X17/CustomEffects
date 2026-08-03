@@ -49,6 +49,7 @@ public class PlaceholderResolver {
         String effectId = plugin.getDatabase().getActiveEffect(uuid);
         String hex = plugin.getDatabase().getHex(uuid);
         String style = plugin.getDatabase().getStyle(uuid);
+        String prefix = plugin.getDatabase().getPrefix(uuid);
 
         String effectName = getEffectName(effectId);
         String effectPreview = getEffectPreview(effectId);
@@ -63,12 +64,28 @@ public class PlaceholderResolver {
         result = result.replace("{effect_status}", effectStatus);
         result = result.replace("{style}", styleName);
         result = result.replace("{style_code}", ColorUtils.styleToLegacy(style != null ? style : ""));
+        result = result.replace("{prefix}", prefix != null ? prefix : "");
 
         return result;
     }
 
     public String resolvePrefix(Player player) {
-        String effectId = plugin.getDatabase().getActiveEffect(player.getUniqueId());
+        UUID uuid = player.getUniqueId();
+        String dbPrefix = plugin.getDatabase().getPrefix(uuid);
+
+        if (dbPrefix != null && !dbPrefix.isEmpty()) {
+            String translated = ColorUtils.translate(dbPrefix);
+            return translated + " "; 
+        }
+
+        if (plugin.getConfig().getBoolean("prefix-system.use-luckperms-default", true)) {
+            String luckpermsPrefix = getLuckPermsPrefix(player);
+            if (luckpermsPrefix != null && !luckpermsPrefix.isEmpty()) {
+                return ColorUtils.translate(luckpermsPrefix);
+            }
+        }
+
+        String effectId = plugin.getDatabase().getActiveEffect(uuid);
         String effectConfigPath = "chat.effects.per-effect-formats." + effectId;
 
         if (plugin.getConfig().contains(effectConfigPath + ".prefix")) {
@@ -86,6 +103,30 @@ public class PlaceholderResolver {
 
         String format = cfg("chat.prefix.format", "[{effect_name}]");
         return resolvePlaceholders(format, player);
+    }
+
+    private String getLuckPermsPrefix(Player player) {
+        try {
+            if (plugin.getServer().getPluginManager().getPlugin("LuckPerms") == null) {
+                return "";
+            }
+            net.luckperms.api.LuckPerms luckPerms = net.luckperms.api.LuckPermsProvider.get();
+            net.luckperms.api.model.user.User user = luckPerms.getUserManager().getUser(player.getUniqueId());
+            if (user == null) {
+                return "";
+            }
+            net.luckperms.api.node.types.MetaNode metaNode = user.getNodes().stream()
+                    .filter(node -> node instanceof net.luckperms.api.node.types.MetaNode)
+                    .map(node -> (net.luckperms.api.node.types.MetaNode) node)
+                    .filter(node -> node.getMetaKey().equals("prefix"))
+                    .findFirst()
+                    .orElse(null);
+            if (metaNode != null && metaNode.getMetaValue() != null) {
+                return metaNode.getMetaValue();
+            }
+        } catch (Exception ignored) {
+        }
+        return "";
     }
 
     public String resolveSuffix(Player player) {
@@ -152,7 +193,8 @@ public class PlaceholderResolver {
     }
 
     private String getStyleName(String style) {
-        if (style == null || style.isEmpty()) return "Sin Formato";
+        if (style == null || style.isEmpty())
+            return "Sin Formato";
         return switch (style) {
             case "bold" -> "Bold";
             case "underline" -> "Underline";

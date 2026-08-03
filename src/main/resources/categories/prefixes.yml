@@ -1,0 +1,123 @@
+ninguno:
+  enable: true
+  slot: 10
+  material: PAPER
+  custom-model-data: 2
+  display: "&#C8F0FF&lREINICIAR PREFIJO"
+  group: "all"
+  prefix: ""
+  permission: ""
+  lore:
+    - "  &8ᴘʀᴇꜰɪᴊᴏꜱ &8ᴅᴇ &8ʀᴀɴɢᴏ"
+    - ""
+    - " &b┃ &7Prefijo Actual:"
+    - " &f  ➜ %ampleffects_prefix%%ampleffects_hex%%player_name%"
+    - ""
+    - " &b┃ &7Cambiará a:"
+    - " &f  ➜ %luckperms_prefix%%ampleffects_hex%%player_name%"
+    - ""
+    - " &e✦ &7Haz clic para cambiar"
+
+# ==========================================
+# OWNER PREFIJOS
+# ==========================================
+
+owner_1:
+  enable: true
+  slot: 11
+  material: PAPER
+  custom-model-data: 3
+  display: "&#C8F0FF&lPREFIJO: <glyph:owner_tag_land_blue><glyph:owner_land_blue>"
+  prefix: "<glyph:owner_tag_land_blue><glyph:owner_land_blue> "
+  permission: "prefix.owner.blue"
+  group: "owner"
+  lore:
+    - "  &8ᴘʀᴇꜰɪᴊᴏꜱ &8ᴅᴇ &8ʀᴀɴɢᴏ"
+    - ""
+    - " &b┃ &7Prefijo Actual:"
+    - " &f  ➜ %ampleffects_prefix%%ampleffects_hex%%player_name%"
+    - ""
+    - " &b┃ &7Cambiará a:"
+    - " &f  ➜ <glyph:owner_tag_land_blue><glyph:owner_land_blue> %ampleffects_hex%%player_name%"
+    - ""
+    - " &e✦ &7Haz clic para cambiar"
+    
+owner_2:
+  enable: true
+  slot: 12
+  material: PAPER
+  custom-model-data: 3
+  display: "&#C8F0FF&lPREFIJO: <glyph:owner_tag_land_light_green><glyph:owner_land_light_green>"
+  prefix: "<glyph:owner_tag_land_light_green><glyph:owner_land_light_green> "
+  permission: "prefix.owner.light_green"
+  group: "owner"
+  lore:
+    - "  &8ᴘʀᴇꜰɪᴊᴏꜱ &8ᴅᴇ &8ʀᴀɴɢᴏ"
+    - ""
+    - " &b┃ &7Prefijo Actual:"
+    - " &f  ➜ %ampleffects_prefix%%ampleffects_hex%%player_name%"
+    - ""
+    - " &b┃ &7Cambiará a:"
+    - " &f  ➜ <glyph:owner_tag_land_light_green><glyph:owner_land_light_green> %ampleffects_hex%%player_name%"
+    - ""
+    - " &e✦ &7Haz clic para cambiarlo"
+
+owner_3:
+  enable: true
+  slot: 13
+  material: PAPER
+  custom-model-data: 3
+  display: "&#C8F0FF&lPREFIJO: <glyph:owner_tag_land_light_pink><glyph:owner_land_light_pink>"
+  prefix: "<glyph:owner_tag_land_light_pink><glyph:owner_land_light_pink> "
+  permission: "prefix.owner.light_pink"
+  group: "owner"
+  lore:
+    - "  &8ᴘʀᴇꜰɪᴊᴏꜱ &8ᴅᴇ &8ʀᴀɴɢᴏ"
+    - ""
+    - " &b┃ &7Prefijo Actual:"
+    - " &f  ➜ %ampleffects_prefix%%ampleffects_hex%%player_name%"
+    - ""
+    - " &b┃ &7Cambiará a:"
+    - " &f  ➜ <glyph:owner_tag_land_light_pink><glyph:owner_land_light_pink> %ampleffects_hex%%player_name%"
+    - ""
+    - " &e✦ &7Haz clic para cambiar"
+
+owner_4:
+  enable: true
+  slot: 19
+  material: PAPER
+  custom-model-data: 3
+  display: "&#C8F0FF&lPREFIJO: <glyph:owner_tag_land_light_orange><glyph:owner_land_light_orange>"
+  prefix: "<glyph:owner_tag_land_light_orange><glyph:owner_land_light_orange> "
+  permission: "prefix.owner.light_orange"
+  group: "owner"
+  lore:
+    - "  &8ᴘʀᴇꜰɪᴊᴏꜱ &8ᴅᴇ &8ʀᴀɴɢᴏ"
+    - ""
+    - " &b┃ &7Prefijo Actual:"
+    - " &f  ➜ %ampleffects_prefix%%ampleffects_hex%%player_name%"
+    - ""
+    - " &b┃ &7Cambiará a:"
+    - " &f  ➜ <glyph:owner_tag_land_light_orange><glyph:owner_land_light_orange> %ampleffects_hex%%player_name%"
+    - ""
+    - " &e✦ &7Haz clic para cambiar"
+
+owner_5:
+  enable: true
+  slot: 20
+  material: PAPER
+  custom-model-data: 3
+  display: "&#C8F0FF&lPREFIJO: <glyph:owner_tag_land_purple><glyph:owner_land_purple>"
+  prefix: "<glyph:owner_tag_land_purple><glyph:owner_land_purple> "
+  permission: "prefix.owner.purple"
+  group: "owner"
+  lore:
+    - "  &8ᴘʀᴇꜰɪᴊᴏꜱ &8ᴅᴇ &8ʀᴀɴɢᴏ"
+    - ""
+    - " &b┃ &7Prefijo Actual:"
+    - " &f  ➜ %ampleffects_prefix%%ampleffects_hex%%player_name%"
+    - ""
+    - " &b┃ &7Cambiará a:"
+    - " &f  ➜ <glyph:owner_tag_land_purple><glyph:owner_land_purple> %ampleffects_hex%%player_name%"
+    - ""
+    - " &e✦ &7Haz clic para cambiar"

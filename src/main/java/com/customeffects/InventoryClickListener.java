@@ -177,6 +177,11 @@ public class InventoryClickListener implements Listener {
     }
 
     private void equipEffect(Player player, String effectId, String categoryId, String subcategoryId, int page) {
+        if (this.plugin.isPrefixCategory(categoryId)) {
+            equipPrefix(player, effectId, categoryId, subcategoryId, page);
+            return;
+        }
+
         YamlConfiguration catConfig = this.plugin.getCategoryConfig(categoryId);
         String perm = catConfig.getString(effectId + ".permission", "");
         if (!perm.isEmpty() && !player.hasPermission(perm))
@@ -196,12 +201,49 @@ public class InventoryClickListener implements Listener {
         });
     }
 
+    private void equipPrefix(Player player, String prefixId, String categoryId, String subcategoryId, int page) {
+        YamlConfiguration catConfig = this.plugin.getCategoryConfig(categoryId);
+        String perm = catConfig.getString(prefixId + ".permission", "");
+        if (!perm.isEmpty() && !player.hasPermission(perm))
+            return;
+
+        Bukkit.getScheduler().runTaskAsynchronously(this.plugin, () -> {
+            String prefix;
+
+            // Si prefixId es vacío, significa que seleccionó "ninguno"
+            if (prefixId == null || prefixId.isEmpty()) {
+                // Obtener el prefix de LuckPerms
+                prefix = this.plugin.getLuckPermsPrefix(player);
+
+                Bukkit.getScheduler().runTask(this.plugin, () -> {
+                    player.sendMessage(ColorUtils.translate(
+                            resolvePrefix("&a✓ &7Prefix reiniciado al de LuckPerms.")));
+                });
+            } else {
+                // Obtener el prefix del archivo yml
+                prefix = this.plugin.getPrefixValue(prefixId, categoryId);
+            }
+
+            this.plugin.getDatabase().savePrefix(player.getUniqueId(), prefix);
+
+            Bukkit.getScheduler().runTask(this.plugin, () -> {
+                this.playSound(player, "sounds.equip", Sound.ENTITY_PLAYER_LEVELUP);
+                if (subcategoryId != null && !subcategoryId.isEmpty()) {
+                    MenuCreator.openCategoryMenu(player, this.plugin, categoryId, subcategoryId, page);
+                } else {
+                    MenuCreator.openCategoryMenu(player, this.plugin, categoryId, page);
+                }
+            });
+        });
+    }
+
     private String extractCategoryFromTitle(String title) {
         if (title.contains("\u2502")) {
             String[] parts = title.split("\u2502");
             if (parts.length > 1) {
                 String[] catSub = parts[1].split(":");
-                if (catSub.length > 0) return catSub[0];
+                if (catSub.length > 0)
+                    return catSub[0];
             }
         }
         ConfigurationSection categories = this.plugin.getConfig().getConfigurationSection("main-menu.categories");
@@ -221,7 +263,8 @@ public class InventoryClickListener implements Listener {
             String[] parts = title.split("\u2502");
             if (parts.length > 1) {
                 String[] catSub = parts[1].split(":");
-                if (catSub.length > 1) return catSub[1];
+                if (catSub.length > 1)
+                    return catSub[1];
             }
         }
         return null;
@@ -229,7 +272,9 @@ public class InventoryClickListener implements Listener {
 
     private int extractPageFromTitle(String title) {
         try {
-            return title.contains("P\u00e1g. ") ? Integer.parseInt(title.split("P\u00e1g. ")[1].replaceAll("[^0-9]", "")) - 1 : 0;
+            return title.contains("P\u00e1g. ")
+                    ? Integer.parseInt(title.split("P\u00e1g. ")[1].replaceAll("[^0-9]", "")) - 1
+                    : 0;
         } catch (Exception e) {
             return 0;
         }

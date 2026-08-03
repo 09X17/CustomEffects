@@ -3,129 +3,168 @@ gradientes_azules:
   material: PAPER
   custom-model-data: 2040
   slot: 10
-  skull-value: 'eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMTYzZTQ5ZDcwNDNlNTk0MDJlMDZiNWE5NWUzODVkOTRmYzMwOGY4NjkyNTQ4NWVhMDA1ZjRjYjJmZDI5OGEyMCJ9fX0='
-  display: "#DCEBFF&lGRADIENTE AZUL"
-  hex: "#DCEBFF"
-  permission: "effectos.gradienteazul"
-  preview: "#DCEBFF¡Hola Mundo!"
+  skull-value: eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMTYzZTQ5ZDcwNDNlNTk0MDJlMDZiNWE5NWUzODVkOTRmYzMwOGY4NjkyNTQ4NWVhMDA1ZjRjYjJmZDI5OGEyMCJ9fX0=
+  display: '#DCEBFF&lGRADIENTE AZUL'
+  hex: '#DCEBFF'
+  permission: effectos.gradienteazul
+  preview: '#DCEBFF¡Hola Mundo!'
+  subcategory: estaticos
 
 gradientes_amarillo:
   enable: true
   material: PAPER
   custom-model-data: 2058
   slot: 11
-  skull-value: 'eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMTYzZTQ5ZDcwNDNlNTk0MDJlMDZiNWE5NWUzODVkOTRmYzMwOGY4NjkyNTQ4NWVhMDA1ZjRjYjJmZDI5OGEyMCJ9fX0='
-  display: "#FFF6D6&lGRADIENTE AMARILLO"
-  hex: "#FFF6D6"
-  permission: "effectos.gradienteamarillo"
-  preview: "#FFF6D6¡Hola Mundo!"
+  skull-value: eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMTYzZTQ5ZDcwNDNlNTk0MDJlMDZiNWE5NWUzODVkOTRmYzMwOGY4NjkyNTQ4NWVhMDA1ZjRjYjJmZDI5OGEyMCJ9fX0=
+  display: '#FFF6D6&lGRADIENTE AMARILLO'
+  hex: '#FFF6D6'
+  permission: effectos.gradienteamarillo
+  preview: '#FFF6D6¡Hola Mundo!'
+  subcategory: estaticos
 
 gradiente_sakura:
   enable: true
   material: PAPER
   custom-model-data: 2060
   slot: 12
-  skull-value: 'eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZWJmZWQ1MTZmOGI0ZTVlZjhjNGFjYzEyNTdjZmRjMGY3ZWI2OGMzMjNkMWFhYWU0MjVmOTI5NThhNGY0NTMzZCJ9fX0='
-  display: "#F8F8A8&lGRADIENTE SAKURA"
-  hex: "#F8F8A8"
-  permission: "effectos.gradientesakura"
-  preview: "#F8F8A8¡Hola Mundo!"
+  skull-value: eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZWJmZWQ1MTZmOGI0ZTVlZjhjNGFjYzEyNTdjZmRjMGY3ZWI2OGMzMjNkMWFhYWU0MjVmOTI5NThhNGY0NTMzZCJ9fX0=
+  display: '#F8F8A8&lGRADIENTE SAKURA'
+  hex: '#F8F8A8'
+  permission: effectos.gradientesakura
+  preview: '#F8F8A8¡Hola Mundo!'
+  subcategory: estaticos
 
 gradiente_dinamico_rb:
   enable: true
   material: PAPER
   custom-model-data: 2068
   slot: 13
-  skull-value: 'eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZWJmZWQ1MTZmOGI0ZTVlZjhjNGFjYzEyNTdjZmRjMGY3ZWI2OGMzMjNkMWFhYWU0MjVmOTI5NThhNGY0NTMzZCJ9fX0='
-  display: "#F8F88C&lGRADIENTE DINÁMICO RB"
-  hex: "#F8F88C"
-  permission: "effectos.dynamicgradientrb"
-  preview: "#F8F88C¡Hola Mundo!"
+  skull-value: eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZWJmZWQ1MTZmOGI0ZTVlZjhjNGFjYzEyNTdjZmRjMGY3ZWI2OGMzMjNkMWFhYWU0MjVmOTI5NThhNGY0NTMzZCJ9fX0=
+  display: '#F8F88C&lGRADIENTE DINÁMICO RB'
+  hex: '#F8F88C'
+  permission: effectos.dynamicgradientrb
+  preview: '#F8F88C¡Hola Mundo!'
+  subcategory: dinamicos
 
 gradientes_carmesi:
   enable: true
   material: PAPER
   custom-model-data: 2052
   slot: 19
-  skull-value: 'eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMTYzZTQ5ZDcwNDNlNTk0MDJlMDZiNWE5NWUzODVkOTRmYzMwOGY4NjkyNTQ4NWVhMDA1ZjRjYjJmZDI5OGEyMCJ9fX0='
-  display: "#FFE0E0&lGRADIENTE CARMESÍ"
-  hex: "#FFE0E0"
-  permission: "effectos.gradientecarmesi"
-  preview: "#FFE0E0¡Hola Mundo!"
+  skull-value: eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMTYzZTQ5ZDcwNDNlNTk0MDJlMDZiNWE5NWUzODVkOTRmYzMwOGY4NjkyNTQ4NWVhMDA1ZjRjYjJmZDI5OGEyMCJ9fX0=
+  display: '#FFE0E0&lGRADIENTE CARMESÍ'
+  hex: '#FFE0E0'
+  permission: effectos.gradientecarmesi
+  preview: '#FFE0E0¡Hola Mundo!'
+  subcategory: estaticos
 
 gradiente_arcano:
   enable: true
   material: PAPER
   custom-model-data: 2050
   slot: 20
-  skull-value: 'eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMTYzZTQ5ZDcwNDNlNTk0MDJlMDZiNWE5NWUzODVkOTRmYzMwOGY4NjkyNTQ4NWVhMDA1ZjRjYjJmZDI5OGEyMCJ9fX0='
-  display: "#F0E6FF&lGRADIENTE DINÁMICO ARCANO"
-  hex: "#F0E6FF"
-  permission: "effectos.arcanerainbow"
-  preview: "#F0E6FF¡Hola Mundo!"
+  skull-value: eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMTYzZTQ5ZDcwNDNlNTk0MDJlMDZiNWE5NWUzODVkOTRmYzMwOGY4NjkyNTQ4NWVhMDA1ZjRjYjJmZDI5OGEyMCJ9fX0=
+  display: '#F0E6FF&lGRADIENTE DINÁMICO ARCANO'
+  hex: '#F0E6FF'
+  permission: effectos.arcanerainbow
+  preview: '#F0E6FF¡Hola Mundo!'
+  subcategory: estaticos
 
 gradiente_arcoiris:
   enable: true
   material: PAPER
   custom-model-data: 2056
   slot: 21
-  skull-value: 'eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvY2Y1OTU0NjZhYjg2NTFlMTU5MDYzODI2NDA3ZjY4OWUxNzg4ODYwZjFlNmUxZjQxZjYyNjY3YzhlZDhhMGQ1YSJ9fX0='
-  display: "#F8F85C&lGRADIENTE ARCOÍRIS"
-  hex: "#F8F85C"
-  permission: "effectos.gradientearcoiris"
-  preview: "#F8F85C¡Hola Mundo!"
+  skull-value: eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvY2Y1OTU0NjZhYjg2NTFlMTU5MDYzODI2NDA3ZjY4OWUxNzg4ODYwZjFlNmUxZjQxZjYyNjY3YzhlZDhhMGQ1YSJ9fX0=
+  display: '#F8F85C&lGRADIENTE ARCOÍRIS'
+  hex: '#F8F85C'
+  permission: effectos.gradientearcoiris
+  preview: '#F8F85C¡Hola Mundo!'
+  subcategory: dinamicos
 
 gradiente_dinamico_prg:
   enable: true
   material: PAPER
   custom-model-data: 2069
   slot: 22
-  skull-value: 'eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZWJmZWQ1MTZmOGI0ZTVlZjhjNGFjYzEyNTdjZmRjMGY3ZWI2OGMzMjNkMWFhYWU0MjVmOTI5NThhNGY0NTMzZCJ9fX0='
-  display: "#EBF5FF&lGRADIENTE DINÁMICO PRG"
-  hex: "#EBF5FF"
-  permission: "effectos.dynamicgradientprg"
-  preview: "#EBF5FF¡Hola Mundo!"
+  skull-value: eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZWJmZWQ1MTZmOGI0ZTVlZjhjNGFjYzEyNTdjZmRjMGY3ZWI2OGMzMjNkMWFhYWU0MjVmOTI5NThhNGY0NTMzZCJ9fX0=
+  display: '#EBF5FF&lGRADIENTE DINÁMICO PRG'
+  hex: '#EBF5FF'
+  permission: effectos.dynamicgradientprg
+  preview: '#EBF5FF¡Hola Mundo!'
+  subcategory: dinamicos
 
 gradiente_esmeralda:
   enable: true
   material: PAPER
   custom-model-data: 2044
   slot: 28
-  skull-value: 'eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMTYzZTQ5ZDcwNDNlNTk0MDJlMDZiNWE5NWUzODVkOTRmYzMwOGY4NjkyNTQ4NWVhMDA1ZjRjYjJmZDI5OGEyMCJ9fX0='
-  display: "#F8F8DC&lGRADIENTE ESMERALDA"
-  hex: "#F8F8DC"
-  permission: "effectos.gradienteesmeralda"
-  preview: "#F8F8DC¡Hola Mundo!"
+  skull-value: eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMTYzZTQ5ZDcwNDNlNTk0MDJlMDZiNWE5NWUzODVkOTRmYzMwOGY4NjkyNTQ4NWVhMDA1ZjRjYjJmZDI5OGEyMCJ9fX0=
+  display: '#F8F8DC&lGRADIENTE ESMERALDA'
+  hex: '#F8F8DC'
+  permission: effectos.gradienteesmeralda
+  preview: '#F8F8DC¡Hola Mundo!'
+  subcategory: estaticos
 
 gradiente_fuego:
   enable: true
   material: PAPER
   slot: 29
   custom-model-data: 2046
-  skull-value: 'eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNGYxMzhmNTZkNzRlNWY1YTlhYzhhYWFjNmYzOTA3MzhkMzU1M2NkNDY1YmQzMjRhYzk4OTIwNDc4N2ViODVjMyJ9fX0='
-  display: "#F8F894&lGRADIENTE FUEGO"
-  hex: "#F8F894"
-  permission: "effectos.gradientefuego"
-  preview: "#F8F894¡Hola Mundo!"
+  skull-value: eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNGYxMzhmNTZkNzRlNWY1YTlhYzhhYWFjNmYzOTA3MzhkMzU1M2NkNDY1YmQzMjRhYzk4OTIwNDc4N2ViODVjMyJ9fX0=
+  display: '#F8F894&lGRADIENTE FUEGO'
+  hex: '#F8F894'
+  permission: effectos.gradientefuego
+  preview: '#F8F894¡Hola Mundo!'
+  subcategory: estaticos
 
 aurora:
   enable: true
   material: PAPER
   custom-model-data: 2054
   slot: 30
-  skull-value: 'eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMTNjYzg1NDQzYjllMTg3Mzc0NDg1ODEzZTA1ZDBkNTNlNDhmNjVhNTM5MWU1MDM3ODliNTM1NDRlM2I2MzQ1YSJ9fX0='
-  display: "#F8F8A0&lGRADIENTE DINÁMICO AURORA"
-  hex: "#F8F8A0"
-  permission: "effectos.aurora"
-  preview: "#F8F8A0¡Hola Mundo!"
+  skull-value: eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMTNjYzg1NDQzYjllMTg3Mzc0NDg1ODEzZTA1ZDBkNTNlNDhmNjVhNTM5MWU1MDM3ODliNTM1NDRlM2I2MzQ1YSJ9fX0=
+  display: '#F8F8A0&lGRADIENTE DINÁMICO AURORA'
+  hex: '#F8F8A0'
+  permission: effectos.aurora
+  preview: '#F8F8A0¡Hola Mundo!'
+  subcategory: dinamicos
 
 gradiente_dinamico_gyr:
   enable: true
   material: PAPER
   custom-model-data: 2070
   slot: 31
-  skull-value: 'eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZWJmZWQ1MTZmOGI0ZTVlZjhjNGFjYzEyNTdjZmRjMGY3ZWI2OGMzMjNkMWFhYWU0MjVmOTI5NThhNGY0NTMzZCJ9fX0='
-  display: "#B4C8FF&lGRADIENTE DINÁMICO GYR"
-  hex: "#B4C8FF"
-  permission: "effectos.dynamicgradientgyr"
-  preview: "#B4C8FF¡Hola Mundo!"
+  skull-value: eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZWJmZWQ1MTZmOGI0ZTVlZjhjNGFjYzEyNTdjZmRjMGY3ZWI2OGMzMjNkMWFhYWU0MjVmOTI5NThhNGY0NTMzZCJ9fX0=
+  display: '#B4C8FF&lGRADIENTE DINÁMICO GYR'
+  hex: '#B4C8FF'
+  permission: effectos.dynamicgradientgyr
+  preview: '#B4C8FF¡Hola Mundo!'
+  subcategory: dinamicos
+subcategories:
+  estaticos:
+    enable: true
+    material: PAPER
+    custom-model-data: 3001
+    slot: 10
+    skull-value: eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMTYzZTQ5ZDcwNDNlNTk0MDJlMDZiNWE5NWUzODVkOTRmYzMwOGY4NjkyNTQ4NWVhMDA1ZjRjYjJmZDI5OGEyMCJ9fX0=
+    display: '#DCEBFF&lGRADIENTES ESTÁTICOS'
+    lore:
+    - ''
+    - ' &7Gradientes de color'
+    - ' &7sólido y uniformes'
+    - ''
+    - ' &e✦ Click para abrir'
+  dinamicos:
+    enable: true
+    material: PAPER
+    custom-model-data: 3002
+    slot: 11
+    skull-value: eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMTYzZTQ5ZDcwNDNlNTk0MDJlMDZiNWE5NWUzODVkOTRmYzMwOGY4NjkyNTQ4NWVhMDA1ZjRjYjJmZDI5OGEyMCJ9fX0=
+    display: '#F8F85C&lGRADIENTES DINÁMICOS'
+    lore:
+    - ''
+    - ' &7Gradientes animados'
+    - ' &7y cromáticos'
+    - ''
+    - ' &e✦ Click para abrir'

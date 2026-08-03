@@ -20,11 +20,20 @@ import org.bukkit.persistence.PersistentDataType;
 import com.customeffects.utils.ColorUtils;
 import com.customeffects.utils.SkullUtils;
 
+import me.clip.placeholderapi.PlaceholderAPI;
 import net.kyori.adventure.text.Component;
 
 public class MenuCreator {
 
     public MenuCreator() {
+    }
+
+    private static String resolvePlaceholders(Player player, String text) {
+        if (text == null || text.isEmpty()) return text;
+        if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
+            return PlaceholderAPI.setPlaceholders(player, text);
+        }
+        return text;
     }
 
     public static void openMainMenu(Player player, CustomEffects plugin) {
@@ -59,16 +68,17 @@ public class MenuCreator {
                 ItemMeta meta = item.getItemMeta();
                 if (meta != null) {
                     String displayName = plugin.getConfig().getString(path + "display", key);
-                    meta.displayName(ColorUtils.toComponent(displayName != null ? displayName : key));
+                    meta.displayName(ColorUtils.toComponent(resolvePlaceholders(player, displayName != null ? displayName : key)));
 
                     if (plugin.getConfig().contains(path + "custom-model-data")) {
                         meta.setCustomModelData(plugin.getConfig().getInt(path + "custom-model-data"));
                     }
 
                     List<String> lore = plugin.getConfig().getStringList(path + "lore");
-                    List<Component> translatedLore = lore.stream()
-                            .map(ColorUtils::toComponent)
-                            .collect(Collectors.toList());
+                    List<Component> translatedLore = new ArrayList<>();
+                    for (String line : lore) {
+                        translatedLore.add(ColorUtils.toComponent(resolvePlaceholders(player, line)));
+                    }
 
                     NamespacedKey nKey = new NamespacedKey(plugin, "category_id");
                     meta.getPersistentDataContainer().set(nKey, PersistentDataType.STRING, key);
@@ -127,7 +137,7 @@ public class MenuCreator {
 
             ItemMeta meta = item.getItemMeta();
             if (meta != null) {
-                meta.displayName(ColorUtils.toComponent(subcatInfo.getOrDefault("display", subcatId)));
+                meta.displayName(ColorUtils.toComponent(resolvePlaceholders(player, subcatInfo.getOrDefault("display", subcatId))));
 
                 String customModelDataStr = subcatInfo.getOrDefault("custom-model-data", "");
                 if (!customModelDataStr.isEmpty()) {
@@ -141,7 +151,7 @@ public class MenuCreator {
                         : new ArrayList<>();
                 List<Component> finalLore = new ArrayList<>();
                 for (String line : rawLore) {
-                    finalLore.add(ColorUtils.toComponent(line));
+                    finalLore.add(ColorUtils.toComponent(resolvePlaceholders(player, line)));
                 }
                 meta.lore(finalLore);
 
@@ -171,7 +181,8 @@ public class MenuCreator {
     private static void openCategoryEffectsMenu(Player player, CustomEffects plugin, String categoryId, String subcategoryId, int page) {
         ConfigurationSection config = plugin.getConfig();
         UUID uuid = player.getUniqueId();
-        String activeEffect = plugin.getDatabase().getActiveEffect(uuid);
+        boolean isPrefixCategory = plugin.isPrefixCategory(categoryId);
+        String activeEffect = isPrefixCategory ? plugin.getDatabase().getPrefix(uuid) : plugin.getDatabase().getActiveEffect(uuid);
 
         String displayTitle;
         if (subcategoryId != null && !subcategoryId.isEmpty()) {
@@ -184,7 +195,7 @@ public class MenuCreator {
 
         String titleSuffix = subcategoryId != null && !subcategoryId.isEmpty()
                 ? " &8\u2502" + categoryId + ":" + subcategoryId
-                : "";
+                : " &8\u2502" + categoryId;
         Component menuTitle = ColorUtils.toComponent(displayTitle + " &8- P\u00e1g. " + (page + 1) + titleSuffix);
 
         int size = plugin.getSubMenuSize();
@@ -195,6 +206,16 @@ public class MenuCreator {
             effects = plugin.getEffectsBySubcategory(categoryId, subcategoryId);
         } else {
             effects = plugin.getEffectsByCategory(categoryId);
+        }
+
+        if (isPrefixCategory) {
+            effects = new ArrayList<>(effects);
+            effects.removeIf(effectId -> {
+                YamlConfiguration catConfig = plugin.getCategoryConfig(categoryId);
+                if (catConfig == null) return false;
+                String prefixGroup = catConfig.getString(effectId + ".group", "all");
+                return !plugin.canPlayerSeePrefix(player, prefixGroup);
+            });
         }
 
         int effectsPerPage = plugin.getEffectsPerPage();
@@ -209,7 +230,7 @@ public class MenuCreator {
         List<String> defaultLore = plugin.getDefaultLore();
         int autoSlot = 0;
 
-        // 1. Cargar Efectos
+        // 1. Cargar Efectos/Prefijos
         for (int i = start; i < end; ++i) {
             String effectId = effects.get(i);
             if (categoryConfig == null || !categoryConfig.contains(effectId)
@@ -230,23 +251,34 @@ public class MenuCreator {
 
             ItemMeta meta = item.getItemMeta();
             if (meta != null) {
-                meta.displayName(ColorUtils.toComponent(categoryConfig.getString(effectId + ".display", effectId)));
+                meta.displayName(ColorUtils.toComponent(resolvePlaceholders(player, categoryConfig.getString(effectId + ".display", effectId))));
                 if (categoryConfig.contains(effectId + ".custom-model-data"))
                     meta.setCustomModelData(categoryConfig.getInt(effectId + ".custom-model-data"));
 
+                String currentStatus;
+                if (isPrefixCategory) {
+                    String prefixValue = categoryConfig.getString(effectId + ".prefix", "");
+                    boolean isEquipped = prefixValue.equals(activeEffect) || (prefixValue.isEmpty() && (activeEffect == null || activeEffect.isEmpty()));
+                    currentStatus = isEquipped ? equippedMsg
+                            : (player.hasPermission(categoryConfig.getString(effectId + ".permission", "")) ? clickMsg
+                                    : lockedMsg);
+                } else {
+                    currentStatus = effectId.equalsIgnoreCase(activeEffect) ? equippedMsg
+                            : (player.hasPermission(categoryConfig.getString(effectId + ".permission", "")) ? clickMsg
+                                    : lockedMsg);
+                }
+
                 String hex = categoryConfig.getString(effectId + ".hex", "#FFFFFF");
                 String preview = categoryConfig.getString(effectId + ".preview", effectId);
-                String currentStatus = effectId.equalsIgnoreCase(activeEffect) ? equippedMsg
-                        : (player.hasPermission(categoryConfig.getString(effectId + ".permission", "")) ? clickMsg
-                                : lockedMsg);
-
                 List<String> rawLore = categoryConfig.contains(effectId + ".lore")
                         ? categoryConfig.getStringList(effectId + ".lore")
                         : defaultLore;
                 List<Component> finalLore = new ArrayList<>();
-                for (String line : rawLore)
-                    finalLore.add(ColorUtils.toComponent(line.replace("{hex}", hex).replace("{preview}", preview)
-                            .replace("{status}", currentStatus)));
+                for (String line : rawLore) {
+                    String processed = line.replace("{hex}", hex).replace("{preview}", preview)
+                            .replace("{status}", currentStatus);
+                    finalLore.add(ColorUtils.toComponent(resolvePlaceholders(player, processed)));
+                }
 
                 meta.getPersistentDataContainer().set(new NamespacedKey(plugin, "effect_id"), PersistentDataType.STRING,
                         effectId);
@@ -258,45 +290,47 @@ public class MenuCreator {
                 inv.setItem(targetSlot, item);
         }
 
-        // 2. Cargar Formatos (con soporte para enable)
-        String currentStyle = plugin.getDatabase().getStyle(player.getUniqueId());
-        ConfigurationSection formatItems = config.getConfigurationSection("format-menu.items");
-        if (formatItems != null) {
-            for (String key : formatItems.getKeys(false)) {
-                String path = "format-menu.items." + key + ".";
-                if (!config.getBoolean(path + "enable", true))
-                    continue;
+        // 2. Cargar Formatos (solo para categorías de efectos, no prefijos)
+        if (!isPrefixCategory) {
+            String currentStyle = plugin.getDatabase().getStyle(player.getUniqueId());
+            ConfigurationSection formatItems = config.getConfigurationSection("format-menu.items");
+            if (formatItems != null) {
+                for (String key : formatItems.getKeys(false)) {
+                    String path = "format-menu.items." + key + ".";
+                    if (!config.getBoolean(path + "enable", true))
+                        continue;
 
-                ItemStack item = new ItemStack(Material.matchMaterial(config.getString(path + "material", "PAPER")));
-                ItemMeta meta = item.getItemMeta();
-                if (meta != null) {
-                    String style = config.getString(path + "style", "");
-                    boolean isActive = (style != null && style.equals(currentStyle))
-                            || (style.isEmpty() && (currentStyle == null || currentStyle.isEmpty()));
-                    meta.displayName(
-                            ColorUtils.toComponent(config.getString(path + "display", key) + (isActive ? " &a\u2714" : "")));
-                    if (config.contains(path + "custom-model-data"))
-                        meta.setCustomModelData(config.getInt(path + "custom-model-data"));
+                    ItemStack item = new ItemStack(Material.matchMaterial(config.getString(path + "material", "PAPER")));
+                    ItemMeta meta = item.getItemMeta();
+                    if (meta != null) {
+                        String style = config.getString(path + "style", "");
+                        boolean isActive = (style != null && style.equals(currentStyle))
+                                || (style.isEmpty() && (currentStyle == null || currentStyle.isEmpty()));
+                        meta.displayName(
+                                ColorUtils.toComponent(config.getString(path + "display", key) + (isActive ? " &a\u2714" : "")));
+                        if (config.contains(path + "custom-model-data"))
+                            meta.setCustomModelData(config.getInt(path + "custom-model-data"));
 
-                    List<String> lore = config.getStringList(path + "lore");
-                    List<Component> translatedLore = new ArrayList<>();
-                    for (String line : lore)
-                        translatedLore.add(ColorUtils.toComponent(line));
-                    meta.lore(translatedLore);
+                        List<String> lore = config.getStringList(path + "lore");
+                        List<Component> translatedLore = new ArrayList<>();
+                        for (String line : lore)
+                            translatedLore.add(ColorUtils.toComponent(line));
+                        meta.lore(translatedLore);
 
-                    meta.getPersistentDataContainer().set(new NamespacedKey(plugin, "format_style"),
-                            PersistentDataType.STRING, style);
-                    meta.getPersistentDataContainer().set(new NamespacedKey(plugin, "pending_effect"),
-                            PersistentDataType.STRING, "");
-                    meta.getPersistentDataContainer().set(new NamespacedKey(plugin, "pending_category"),
-                            PersistentDataType.STRING, categoryId);
-                    meta.getPersistentDataContainer().set(new NamespacedKey(plugin, "pending_subcategory"),
-                            PersistentDataType.STRING, subcategoryId != null ? subcategoryId : "");
-                    item.setItemMeta(meta);
+                        meta.getPersistentDataContainer().set(new NamespacedKey(plugin, "format_style"),
+                                PersistentDataType.STRING, style);
+                        meta.getPersistentDataContainer().set(new NamespacedKey(plugin, "pending_effect"),
+                                PersistentDataType.STRING, "");
+                        meta.getPersistentDataContainer().set(new NamespacedKey(plugin, "pending_category"),
+                                PersistentDataType.STRING, categoryId);
+                        meta.getPersistentDataContainer().set(new NamespacedKey(plugin, "pending_subcategory"),
+                                PersistentDataType.STRING, subcategoryId != null ? subcategoryId : "");
+                        item.setItemMeta(meta);
+                    }
+                    int slot = config.getInt(path + "slot", 0);
+                    if (slot >= 0 && slot < size)
+                        inv.setItem(slot, item);
                 }
-                int slot = config.getInt(path + "slot", 0);
-                if (slot >= 0 && slot < size)
-                    inv.setItem(slot, item);
             }
         }
 
@@ -305,10 +339,10 @@ public class MenuCreator {
             inv.setItem(config.getInt("navigation.back-main.slot", 45),
                     createNavigationItem(config, "navigation.back-main", -1, -1));
         }
-        if (config.getBoolean("reset-item.enable", true)) {
+        if (!isPrefixCategory && config.getBoolean("reset-item.enable", true)) {
             inv.setItem(config.getInt("reset-item.slot", 49), createNavigationItem(config, "reset-item", -1, -1));
         }
-        if (config.getBoolean("format-button.enable", false)) {
+        if (!isPrefixCategory && config.getBoolean("format-button.enable", false)) {
             inv.setItem(config.getInt("format-button.slot", 46), createNavigationItem(config, "format-button", -1, -1));
         }
         if (page > 0 && config.getBoolean("navigation.previous-page.enable", true)) {
@@ -353,7 +387,7 @@ public class MenuCreator {
                             || (style.isEmpty() && (currentStyle == null || currentStyle.isEmpty()));
 
                     String activeIndicator = isActive ? " &a\u2714" : "";
-                    meta.displayName(ColorUtils.toComponent((display != null ? display : key) + activeIndicator));
+                    meta.displayName(ColorUtils.toComponent(resolvePlaceholders(player, (display != null ? display : key) + activeIndicator)));
 
                     if (config.contains(path + "custom-model-data")) {
                         meta.setCustomModelData(config.getInt(path + "custom-model-data"));
@@ -362,7 +396,7 @@ public class MenuCreator {
                     List<String> lore = config.getStringList(path + "lore");
                     List<Component> translatedLore = new ArrayList<>();
                     for (String line : lore) {
-                        translatedLore.add(ColorUtils.toComponent(line));
+                        translatedLore.add(ColorUtils.toComponent(resolvePlaceholders(player, line)));
                     }
                     meta.lore(translatedLore);
 
